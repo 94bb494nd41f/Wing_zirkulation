@@ -3,13 +3,14 @@ import shutil
 import math
 import matplotlib.pyplot as plt
 import numpy as np
+from operator import itemgetter
 
 
 def Einlesen():
     cwd=os.getcwd()
     print('\n das ist die cwd:\n ', cwd)
 
-
+    wingtotal_list=[]
     os.chdir(cwd+'/sampleDict_python_plotlines')
     list_timesteps=os.listdir(os.getcwd())
     print('Timesteps', list_timesteps)
@@ -18,7 +19,7 @@ def Einlesen():
 
     samplewd=os.getcwd()
     for x_dir in list_timesteps[:]:
-        print('xdir', x_dir)
+        #print('xdir', x_dir)
         os.chdir(samplewd+'/'+str(x_dir))
 
         # removing previous plots
@@ -32,25 +33,26 @@ def Einlesen():
         c_list = []
         line_list = []
         #muss so eingelesen werden, sonst zuordnung lines zu plane schwierig. gibt bestimmt einfacheren weg
-        for y_dir in l_data[:]:
-            #sonst werden auch ordner etc versucht zu laden
-            if 'c'==y_dir[0]:
-               if y_dir[2:5] not in c_list:
-                   c_list.append(y_dir[2:5])
-               line_list.append(y_dir[6])
 
+
+        #get string until '_'
+        for y_dir in l_data:
+            if 'c' == y_dir[0]:
+                if y_dir.partition('_') [0] not in c_list:
+                    c_list.append(y_dir.partition('_')[0])
+                line_list.append(y_dir.split('_')[1])
 
                 #print('linelist:', line_list, 'max', max(line_list))
         c_gamma = []
-        c_list.sort() #sortieren fuer Datei
+        c_list.sort()
         for c in c_list[:]:
-            print('c', c)
+            #print('c', c)
             #x,y,z,u_x,u_y,u_z
 
             #loading into mydata
             n=0
             for i in range(1, int(max(line_list))+1):
-                filename='c*'+str(c)+'_'+str(i) + '_' + 'U.xy'
+                filename=str(c)+'_'+str(i) + '_' + 'U.xy'
                 #print('timestep', x_dir, 'currentfile', str(c)+'_'+str(i) + '_' + 'U')
                 if i==1:
                     mydata_1 = np.genfromtxt(str(filename), skip_header=0, dtype=float)
@@ -81,11 +83,13 @@ def Einlesen():
                      #                   ->
                      #                       u_z 4
 
-                    #Signum defined by stepwidth h
+
                     #############################################################################################################
                     ############################integration of mydata_1
                     #############################################################################################################
-                    # Berechnung der Schrittweite funktioniert nur für den Fall von Linien, die sich nicht auf mehr als einer var aendern!
+                    #Berechnung der Schrittweite funktioniert nur für den Fall von Linien, die sich nicht auf mehr als einer var aendern!
+                    #################################################
+                    #x|y|z|u_x|u_y|u_z
                     data_array = mydata_1
                     len_array = len(data_array)-1
                     summe_1 = 0.0
@@ -93,12 +97,12 @@ def Einlesen():
                     h=(((data_array.item((len_array, 0)) + data_array.item((len_array, 1))  + data_array.item((len_array, 2)))\
                     -(data_array.item((0, 0)) + data_array.item((0, 1)) + data_array.item((0, 2))))/float(len_array))
 
-                    print('h1', h)
+                    #print('h1', h)
                     for i in range(1, len_array - 2):
                         # mydata: X|y|z|ux|uy|uz
-                        summe_1 += h * data_array.item((i, 5))
+                        summe_1 += h * data_array.item((i, 4))
 
-                    summe_1 += h *0.5*( data_array.item((0, 5))  + data_array.item((len_array, 5)))
+                    summe_1 += h *0.5*( data_array.item((0, 4))  + data_array.item((len_array, 4)))
                     #############################################################################################################
                     ############################integration of mydata_2
                     #############################################################################################################
@@ -108,12 +112,13 @@ def Einlesen():
                     h = (((data_array.item((len_array, 0)) + data_array.item((len_array, 1)) + data_array.item(
                     (len_array, 2))) \
                      - (data_array.item((0, 0)) + data_array.item((0, 1)) + data_array.item((0, 2)))) / float(len_array))
-                    print('h2',h)
+                    #print('h2',h)
                     for i in range(1, len_array - 2):
                         # mydata: X|y|z|ux|uy|uz
-                        summe_2 += h *data_array.item((i, 4))
+                        #         0|1|2|3 |4 |5
+                        summe_2 += h *data_array.item((i, 5))
 
-                    summe_2 += h *-0.5*( data_array.item((0, 4))  + data_array.item((len_array, 4)))
+                    summe_2 += h *-0.5*( data_array.item((0, 5))  + data_array.item((len_array, 5)))
                     #############################################################################################################
                     ############################integration of mydata_3
                     #############################################################################################################
@@ -122,12 +127,12 @@ def Einlesen():
                     summe_3 = 0.0
                     h = (((data_array.item((len_array, 0)) + data_array.item((len_array, 1)) + data_array.item((len_array, 2))) \
                     - (data_array.item((0, 0)) + data_array.item((0, 1)) + data_array.item((0, 2)))) / float(len_array))
-                    print('h3', h)
+                    #print('h3', h)
                     for i in range(1, len_array - 2):
                         # mydata: X|y|z|ux|uy|uz
-                        summe_3 += h *data_array.item((i, 5))
+                        summe_3 += h *data_array.item((i, 4))
 
-                    summe_3 += h * 0.5 * (data_array.item((0, 5)) + data_array.item((len_array, 5)))
+                    summe_3 += h * 0.5 * (data_array.item((0, 4)) + data_array.item((len_array, 4)))
                     #############################################################################################################
                     ############################integration of mydata_4
                     #############################################################################################################
@@ -138,50 +143,50 @@ def Einlesen():
                         (len_array, 2))) \
                          - (data_array.item((0, 0)) + data_array.item((0, 1)) + data_array.item((0, 2)))) / float(
                         len_array))
-                    print('h4', h)
+                    #print('h4', h)
                     for i in range(1, len_array - 2):
                         # mydata: X|y|z|ux|uy|uz
-                        summe_4 += h * data_array.item((i, 4))
+                        summe_4 += h * data_array.item((i, 5))
 
-                    summe_4 += h * 0.5 * (data_array.item((0, 4)) + data_array.item((len_array, 4)))
+                    summe_4 += h * 0.5 * (data_array.item((0, 5)) + data_array.item((len_array, 5)))
 
 
-                    print('summen:', summe_1, summe_2, summe_3, summe_4)
+                    #print('summen:', summe_1, summe_2, summe_3, summe_4)
                     gamma_total=summe_1+summe_2+summe_3+summe_4
-                    c_gamma.append((c, gamma_total))
+                    #ausgabe der Laufvariable, in diesem Fall z. muss in allen 4 line-sets gleich sein!
+                    #print('c:',c,'z:',mydata_1.item((0, 2)))
+                        # mydata: X|y|z|ux|uy|uz
+                    c_gamma.append((mydata_1.item((0, 0)), gamma_total))
                     gamma_total = 0
-            #struktur: c|gamma
+        #gamma integration over wing
+        g_wing=0
+        #
+        f = plt.figure()
 
+        print('plot of gamma*' 'cwd', os.getcwd())
+        #print(c_gamma)
+        x_val = [x[0] for x in c_gamma]
+        y_val = [x[1] for x in c_gamma]
+        plt.xlabel('Abstand zur x=0 in, hier x_kood ')
+        plt.ylabel('-Zirkulation')
+        plt.plot(x_val, y_val,  linestyle='None')
+        plt.plot(x_val, y_val, 'or',  linestyle='None')
+        f.savefig('plots/gammaspitzenwirbel' + '.pdf', bbox_inches='tight')
 
-    f = plt.figure()
+        os.chdir(os.getcwd()+"/plots/")
+        f=open('gamma_spitzenwirbelverlauf.data','w')
+        f.write('#x in m  \t Gamma in m^2/s \n')
+        for x in c_gamma:
+            a=x[0]
+            b=x[1]
+            f.write(str(a)+'\t'+str(b)+'\n')
+        f.close
 
-    print('plot of gamma*' 'cwd', os.getcwd())
-    print(c_gamma)
-    x_val = [x[0] for x in c_gamma]
-    y_val = [x[1] for x in c_gamma]
-    plt.xlabel('abstand zu hinterkante in c')
-    plt.ylabel('Zirkulation')
-    plt.plot(x_val, y_val,  linestyle='None')
-    plt.plot(x_val, y_val, 'or',  linestyle='None')
-    f.savefig('plots/c_gamma*' + '.pdf', bbox_inches='tight')
-
-    os.chdir(os.getcwd() + "/plots/")
-    f = open('c_gamma_wing.data', 'w')
-    f.write('#x in x/b  \t Gamma in m^2/s \n')
-    for x in c_gamma:
-        a = x[0]
-        b = x[1]
-        f.write(str(a) + '\t' + str(b) + '\n')
-    f.close
-
-    print('plot and Datafile located in:', os.getcwd())
-    plt.show()
-
-
-
-    plt.close()
-
-
+        print('plot and Datafile located in:', os.getcwd())
+        #hier # entfernen um plots zusehen
+        #plt.show(block=False)
+        #plt.pause(1)
+        #plt.close
     return()
 
 
