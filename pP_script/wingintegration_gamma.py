@@ -19,7 +19,7 @@ def Einlesen():
 
     samplewd=os.getcwd()
     for x_dir in list_timesteps[:]:
-        print('xdir', x_dir)
+        #print('xdir', x_dir)
         os.chdir(samplewd+'/'+str(x_dir))
 
         # removing previous plots
@@ -46,7 +46,7 @@ def Einlesen():
         c_gamma = []
         c_list.sort()
         for c in c_list[:]:
-            print('c', c)
+            #print('c', c)
             #x,y,z,u_x,u_y,u_z
 
             #loading into mydata
@@ -173,7 +173,7 @@ def Einlesen():
         f = plt.figure()
 
         print('plot of gamma*' 'cwd', os.getcwd())
-        print(c_gamma)
+        #print(c_gamma)
         x_val = [x[0] for x in c_gamma]
         y_val = [x[1] for x in c_gamma]
         plt.xlabel('Abstand zur wurzel in, hier z_kood ')
