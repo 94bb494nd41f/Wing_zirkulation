@@ -8,9 +8,11 @@ from numpy import genfromtxt
 def linienlegen(finaleliste):
     punkte = []
     for letztereintrag in finaleliste:
-
-        a=0.2
-        b=1.8285
+        #min hight: delta Y_min:0.211=sin(10 deg) *1.21921 ->a=0.1059
+        #min width delta x min: 1.2192 -> b=0.6096
+        #a_max=0.3476
+        a=0.       # total hight=2*ahoehe
+        b=1.8285    #total width =2*b
         #fenster hat die Groesse 2a*2b
 
         c_stern=letztereintrag[1]
