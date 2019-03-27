@@ -24,16 +24,16 @@ cd ..
 
 cp pP_script/$py1 postProcessing/
 cd postProcessing
-python3 $py1
+python3 $py1 |tee log.linegeneration
 
 cd ..
 rm -r postProcessing/sampleDict_python_plotlines
-postProcess -func sampleDict_python_plotlines
+mpirun -np 4 postProcess -parallel -func sampleDict_python_plotlines |tee log.sampling
 
 
 cp pP_script/$py2 postProcessing/
 cd postProcessing
-python3 $py2
+python3 $py2 |tee log.integration
 
 rm $py2
 rm $py1
