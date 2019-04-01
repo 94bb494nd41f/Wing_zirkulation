@@ -12,9 +12,7 @@ def integration(data_array):
     # h=(b-a)/n
     h = (((data_array.item((len_array, 0)) + data_array.item((len_array, 1)) + data_array.item((len_array, 2))) \
           - (data_array.item((0, 0)) + data_array.item((0, 1)) + data_array.item((0, 2)))) / float(len_array))
-    h1 = h
 
-    # print('h1', h)
     for i in range(1, len_array - 0):
         # mydata: X|y|z|ux|uy|uz
         summe_1 += h * data_array.item((i, 4))
@@ -103,11 +101,6 @@ def Einlesen():
                      #           |___________________________|_
                      #                   ->
                      #                       u_z 4
-
-
-
-
-
 
                     summe_1=integration(mydata_1)
                     summe_2=integration(mydata_2)
