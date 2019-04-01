@@ -101,29 +101,17 @@ def Einlesen():
                      #           |___________________________|_
                      #                   ->
                      #                       u_z 4
-
+                    #integration
                     summe_1=integration(mydata_1)
                     summe_2=integration(mydata_2)
                     summe_3=integration(mydata_3)
                     summe_4=integration(mydata_4)
+
                     gamma_total = summe_1 + summe_2 + summe_3 + summe_4
                     # ausgabe der Laufvariable, in diesem Fall z. muss in allen 4 line-sets gleich sein!
                     # print('c:',c,'z:',mydata_1.item((0, 2)))
                     # mydata: X|y|z|ux|uy|uz
                     c_gamma.append((mydata_1.item((0, 0)), gamma_total))
-
-
-
-                    #print('summen:', summe_1, summe_2, summe_3, summe_4)
-                    gamma_total=summe_1+summe_2+summe_3+summe_4
-                    #ausgabe der Laufvariable, in diesem Fall z. muss in allen 4 line-sets gleich sein!
-                    #print('c:',c,'z:',mydata_1.item((0, 2)))
-                        # mydata: X|y|z|ux|uy|uz
-                    c_gamma.append((mydata_1.item((0, 0)), gamma_total))
-                    gamma_total = 0
-        #gamma integration over wing
-        g_wing=0
-        #
         f = plt.figure()
 
         print('plot of gamma*' 'cwd', os.getcwd())
