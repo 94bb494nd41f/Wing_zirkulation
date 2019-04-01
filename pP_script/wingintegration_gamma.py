@@ -5,6 +5,21 @@ import matplotlib.pyplot as plt
 import numpy as np
 from operator import itemgetter
 
+def integration(data_array):
+    #data_array = mydata_1
+    len_array = len(data_array) - 1
+    summe_1 = 0.0
+    # h=(b-a)/n
+    h = (((data_array.item((len_array, 0)) + data_array.item((len_array, 1)) + data_array.item((len_array, 2))) \
+          - (data_array.item((0, 0)) + data_array.item((0, 1)) + data_array.item((0, 2)))) / float(len_array))
+
+    for i in range(1, len_array - 0):
+        # mydata: X|y|z|ux|uy|uz
+        summe_1 += h * data_array.item((i, 4))
+
+    summe_1 += h * 0.5 * (data_array.item((0, 4)) + data_array.item((len_array, 4)))
+    return(summe_1)
+
 
 def Einlesen():
     cwd=os.getcwd()
@@ -49,114 +64,54 @@ def Einlesen():
             #print('c', c)
             #x,y,z,u_x,u_y,u_z
 
-            #loading into mydata
-            n=0
-            for i in range(1, int(max(line_list))+1):
-                filename=str(c)+'_'+str(i) + '_' + 'U.xy'
-                #print('timestep', x_dir, 'currentfile', str(c)+'_'+str(i) + '_' + 'U')
-                if i==1:
+            # loading into mydata
+            n = 0
+            aa = 0
+            bb = 0
+            cc = 0
+            dd = 0
+            for i in range(1, int(max(line_list)) + 1):
+                filename = str(c) + '_' + str(i) + '_' + 'U.xy'
+                # print('timestep', x_dir, 'currentfile', str(c)+'_'+str(i) + '_' + 'U')
+                if i == 1:
                     mydata_1 = np.genfromtxt(str(filename), skip_header=0, dtype=float)
-                    #print(mydata_1.item((0, 0)),mydata_1.item((0, 1)), mydata_1.item((0, 2)))
-                    n +=1
-                if i==2:
+                    # print(mydata_1.item((0, 0)),mydata_1.item((0, 1)), mydata_1.item((0, 2)))
+                    aa = 1
+                if i == 2:
                     mydata_2 = np.genfromtxt(str(filename), skip_header=0, dtype=float)
-                    #print(mydata_2.item((0, 0)), mydata_2.item((0, 1)), mydata_2.item((0, 2)))
-                    n +=1
-                if i==3:
+                    # print(mydata_2.item((0, 0)), mydata_2.item((0, 1)), mydata_2.item((0, 2)))
+                    bb = 1
+                if i == 3:
                     mydata_3 = np.genfromtxt(str(filename), skip_header=0, dtype=float)
-                    #print(mydata_3.item((0, 0)), mydata_3.item((0, 1)), mydata_3.item((0, 2)))
-                    n +=1
-                if i==4:
+                    # print(mydata_3.item((0, 0)), mydata_3.item((0, 1)), mydata_3.item((0, 2)))
+                    cc = 1
+                if i == 4:
                     mydata_4 = np.genfromtxt(str(filename), skip_header=0, dtype=float)
-                    #print(mydata_4.item((0, 0)), mydata_4.item((0, 1)), mydata_4.item((0, 2)))
-                    n +=1
-                #print('n:',n)
-                if n>=4:
-                #if not mydata_1 and mydata_2 and mydata_3 and mydata_4:
+                    # print(mydata_4.item((0, 0)), mydata_4.item((0, 1)), mydata_4.item((0, 2)))
+                    dd = 1
+                # print('n:',n)
+                if aa == 1 and bb == 1 and cc == 1 and dd == 1:
+                    # if not mydata_1 and mydata_2 and mydata_3 and mydata_4:
                     ############################################################################################
-                     #                       -u_z 2
-                     #           ____________________________
-                     #           |           <-              |
-                     #   -u_y 3  |                           |/\ u_y 1
-                     #       \/  |                           |
-                     #           |___________________________|_
-                     #                   ->
-                     #                       u_z 4
+                    #                       -u_z 2
+                    #           ____________________________
+                    #           |           <-              |
+                    #   -u_y 3  |                           |/\ u_y 1
+                    #       \/  |                           |
+                    #           |___________________________|_
+                    #                   ->
+                    #                       u_z 4
+                    # integration
+                    summe_1 = integration(mydata_1)
+                    summe_2 = integration(mydata_2)
+                    summe_3 = integration(mydata_3)
+                    summe_4 = integration(mydata_4)
 
-
-                    #############################################################################################################
-                    ############################integration of mydata_1
-                    #############################################################################################################
-                    #Berechnung der Schrittweite funktioniert nur für den Fall von Linien, die sich nicht auf mehr als einer var aendern!
-                    #################################################
-                    data_array = mydata_1
-                    len_array = len(data_array)-1
-                    summe_1 = 0.0
-                    #h=(b-a)/n
-                    h=(((data_array.item((len_array, 0)) + data_array.item((len_array, 1))  + data_array.item((len_array, 2)))\
-                    -(data_array.item((0, 0)) + data_array.item((0, 1)) + data_array.item((0, 2))))/float(len_array))
-
-                    #print('h1', h)
-                    for i in range(1, len_array - 2):
-                        # mydata: X|y|z|ux|uy|uz
-                        summe_1 += h * data_array.item((i, 3))
-
-                    summe_1 += h *0.5*( data_array.item((0, 3))  + data_array.item((len_array, 3)))
-                    #############################################################################################################
-                    ############################integration of mydata_2
-                    #############################################################################################################
-                    data_array = mydata_2
-                    len_array = len(data_array)-1
-                    summe_2 = 0.0
-                    h = (((data_array.item((len_array, 0)) + data_array.item((len_array, 1)) + data_array.item(
-                    (len_array, 2))) \
-                     - (data_array.item((0, 0)) + data_array.item((0, 1)) + data_array.item((0, 2)))) / float(len_array))
-                    #print('h2',h)
-                    for i in range(1, len_array - 2):
-                        # mydata: X|y|z|ux|uy|uz
-                        #         0|1|2|3 |4 |5
-                        summe_2 += h *data_array.item((i, 4))
-
-                    summe_2 += h *-0.5*( data_array.item((0, 4))  + data_array.item((len_array, 4)))
-                    #############################################################################################################
-                    ############################integration of mydata_3
-                    #############################################################################################################
-                    data_array = mydata_3
-                    len_array = len(data_array)-1
-                    summe_3 = 0.0
-                    h = (((data_array.item((len_array, 0)) + data_array.item((len_array, 1)) + data_array.item((len_array, 2))) \
-                    - (data_array.item((0, 0)) + data_array.item((0, 1)) + data_array.item((0, 2)))) / float(len_array))
-                    #print('h3', h)
-                    for i in range(1, len_array - 2):
-                        # mydata: X|y|z|ux|uy|uz
-                        summe_3 += h *data_array.item((i, 3))
-
-                    summe_3 += h * 0.5 * (data_array.item((0, 3)) + data_array.item((len_array, 3)))
-                    #############################################################################################################
-                    ############################integration of mydata_4
-                    #############################################################################################################
-                    data_array = mydata_4
-                    len_array = len(data_array)-1
-                    summe_4 = 0.0
-                    h = (((data_array.item((len_array, 0)) + data_array.item((len_array, 1)) + data_array.item(
-                        (len_array, 2))) \
-                         - (data_array.item((0, 0)) + data_array.item((0, 1)) + data_array.item((0, 2)))) / float(
-                        len_array))
-                    #print('h4', h)
-                    for i in range(1, len_array - 2):
-                        # mydata: X|y|z|ux|uy|uz
-                        summe_4 += h * data_array.item((i, 4))
-
-                    summe_4 += h * 0.5 * (data_array.item((0, 4)) + data_array.item((len_array, 4)))
-
-
-                    #print('summen:', summe_1, summe_2, summe_3, summe_4)
-                    gamma_total=summe_1+summe_2+summe_3+summe_4
-                    #ausgabe der Laufvariable, in diesem Fall z. muss in allen 4 line-sets gleich sein!
-                    #print('c:',c,'z:',mydata_1.item((0, 2)))
-                    c_gamma.append((mydata_1.item((0, 2)), gamma_total))
-                    gamma_total = 0
-        #gamma integration over wing
+                    gamma_total = summe_1 + summe_2 + summe_3 + summe_4
+                    # ausgabe der Laufvariable, in diesem Fall z. muss in allen 4 line-sets gleich sein!
+                    # print('c:',c,'z:',mydata_1.item((0, 2)))
+                    # mydata: X|y|z|ux|uy|uz
+                    c_gamma.append((mydata_1.item((0, 0)), gamma_total))
         g_wing=0
         #
 
