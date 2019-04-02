@@ -7,21 +7,26 @@ def dinge():
     print('ich bin super!')
     return()
 
-def integration(data_array):
+def integration(data_array, u_direction):
     len_array = len(data_array) - 1
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
     # Watch out for len_array already reduced by one!
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
     summe = 0.0
 
-    h = (((data_array.item((len_array, 0)) + data_array.item((len_array, 1)) + data_array.item((len_array, 2))) \
+    h = (((data_array.item((len_array, 0)) + data_array.item((len_array, 1)) + data_array.item((len_array, 2)))
           - (data_array.item((0, 0)) + data_array.item((0, 1)) + data_array.item((0, 2)))) / float(len_array))
-
+    if 'uyup' in u_direction or 'uydown' in u_direction:
+        point=4
+    elif 'uzleft' in u_direction or 'uzright' in u_direction:
+        point=5
+    elif 'uxleft'in u_direction or 'uxright' in u_direction:
+        point=3
     for i in range(1, len_array - 0):
         #  mydata: X|y|z|ux|uy|uz
-        summe+= h * data_array.item((i, 4))
+        summe+= h * data_array.item((i, point))
 
-    summe += h * 0.5 * (data_array.item((0, 4)) + data_array.item((len_array, 4)))
+    summe += h * 0.5 * (data_array.item((0, point)) + data_array.item((len_array, point)))
     return(summe)
 
 # load data
@@ -107,30 +112,45 @@ def Einlesen(plotkind):
                 # print('n:',n)
 
 
-
                 if aa==1 and bb==1 and cc==1 and dd==1:
                 # if not mydata_1 and mydata_2 and mydata_3 and mydata_4:
+                    if 'wing' in plotkind:
+                        # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+                         #                        -u_z 2
+                         #            ____________________________
+                         #            |           <-              |
+                         #    -u_y 3  |                           |/\ u_y 1
+                         #        \/  |                           |
+                         #            |___________________________|_
+                         #                    ->
+                         #                        u_z 4
+                        # integration around vortex
+                        summe_1=integration(mydata_1, u_direction='uyup')
+                        summe_2=integration(mydata_2, u_direction='uxleft')
+                        summe_3=integration(mydata_3, u_direction='uydown')
+                        summe_4=integration(mydata_4, u_direction='uxright')
+                        gamma_total = summe_1 + summe_2 + summe_3 + summe_4
+                        #  mydata: X|y|z|ux|uy|uz
+                        c_gamma.append((mydata_1.item((0, 2)), gamma_total))
+                    if 'vortex' in plotkind:
+                        # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+                        #                        -u_z 2
+                        #            ____________________________
+                        #            |           <-              |
+                        #    -u_y 3  |                           |/\ u_y 1
+                        #        \/  |                           |
+                        #            |___________________________|_
+                        #                    ->
+                        #                        u_z 4
+                        # integration around wing
+                        summe_1 = integration(mydata_1, u_direction='uyup')
+                        summe_2 = integration(mydata_2, u_direction='uzleft')
+                        summe_3 = integration(mydata_3, u_direction='uydown')
+                        summe_4 = integration(mydata_4, u_direction='uzright')
+                        gamma_total = summe_1 + summe_2 + summe_3 + summe_4
+                        #  mydata: X|y|z|ux|uy|uz
+                        c_gamma.append((mydata_1.item((0, 0)), gamma_total))
 
-                    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-                     #                        -u_z 2
-                     #            ____________________________
-                     #            |           <-              |
-                     #    -u_y 3  |                           |/\ u_y 1
-                     #        \/  |                           |
-                     #            |___________________________|_
-                     #                    ->
-                     #                        u_z 4
-                    # integration
-                    summe_1=integration(mydata_1)
-                    summe_2=integration(mydata_2)
-                    summe_3=integration(mydata_3)
-                    summe_4=integration(mydata_4)
-
-                    gamma_total = summe_1 + summe_2 + summe_3 + summe_4
-                    #  ausgabe der Laufvariable, in diesem Fall z. muss in allen 4 line-sets gleich sein!
-                    #  print('c:',c,'z:',mydata_1.item((0, 2)))
-                    #  mydata: X|y|z|ux|uy|uz
-                    c_gamma.append((mydata_1.item((0, 0)), gamma_total))
 
         plotting(c_gamma, plotkind)
         os.chdir(cwd)
@@ -182,6 +202,3 @@ if __name__ == '__main__':
     print('Bitte README lesen')
     plotkind='vortex'
     c_gamma=Einlesen(plotkind)
-
-
-

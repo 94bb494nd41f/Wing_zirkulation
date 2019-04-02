@@ -10,10 +10,10 @@
 
 echo "needs to be run from inside pP_script!
 Readme:
-	needs Python 3.6 (at least 3, i think)
-	Error: no module matplotlib found? install matplotlib using 'python3 -m 	install matplotlib'
-	Error: no moudle tkinter found? install tkinter using 'sudo apt-get install 	python3-tk'
-	worked for me"
+        needs Python 3.6 (at least 3, i think)
+        Error: no module matplotlib found? install matplotlib using 'python3 -m 	install matplotlib'
+        Error: no moudle tkinter found? install tkinter using 'sudo apt-get install 	python3-tk'
+        worked for me \n \n \n \n"
 #first python tool
 py1=line_gen_gamma.py
 py2=integration_gamma.py
