@@ -3,7 +3,6 @@
 import os
 
 
-
 def linienlegen(finaleliste, a, b, c):
     punkte = []
     for letztereintrag in finaleliste:
@@ -25,7 +24,7 @@ def linienlegen(finaleliste, a, b, c):
     return (punkte)
 
 
-def sampledict(punkte):
+def sampledict(punkte, kind):
     cwd = os.getcwd()
     print(cwd)
     # os.path.abspath(os.path.join(__file__ ,"../.."))
@@ -66,18 +65,33 @@ def sampledict(punkte):
         # kontrollausgaben
         # print('c*'+str(c)+'_'+str(line_nummer)+'\n')
         # print('c*' + i[6] + '_' + str(line_nummer) + '\n')
-        f.write('c' + str(z_1) + '_' + str(line_nummer) + '\n'
-                                                          ' {\n'
-                                                          ' type uniform;\n'
-                                                          ' axis xyz;\n'
-                                                          ' start ( ' + str(x_1) + ' ' + str(y_1) + ' ' + str(
-            z_1) + ');\n'
-                   ' end (' + str(x_2) + ' ' + str(y_2) + ' ' + str(z_2) + ');\n'
-                                                                           ' nPoints \t 1000;\n'
-                                                                           '}\n\n')
+        if 'wing' in kind:
+            f.write('c' + str(z_1) + '_' + str(line_nummer) + '\n'
+                                                              ' {\n'
+                                                              ' type uniform;\n'
+                                                              ' axis xyz;\n'
+                                                              ' start ( ' + str(x_1) + ' ' + str(y_1) + ' ' + str(
+                z_1) + ');\n'
+                       ' end (' + str(x_2) + ' ' + str(y_2) + ' ' + str(z_2) + ');\n'
+                                                                               ' nPoints \t 1000;\n'
+                                                                               '}\n\n')
+        elif 'vortex' in kind:
+            f.write('c' + str(x_1) + '_' + str(line_nummer) + '\n'
+                                                              ' {\n'
+                                                              ' type uniform;\n'
+                                                              ' axis xyz;\n'
+                                                              ' start ( ' + str(x_1) + ' ' + str(y_1) + ' ' + str(
+                z_1) + ');\n'
+                       ' end (' + str(x_2) + ' ' + str(y_2) + ' ' + str(z_2) + ');\n'
+                                                                               ' nPoints \t 1000;\n'
+                                                                               '}\n\n')
+        else:
+            print('error: unkown kind')
 
     f.write(');')
     f.close()
+    os.chdir(cwd)
+    return()
 
 
 if __name__ == '__main__':
@@ -85,11 +99,11 @@ if __name__ == '__main__':
     # hier werden die zentralen punkte x,y,z definiert
     ##############################################################
     finaleliste = []
-    c = 0.91
+    chord = 0.91
     # width and hight of fenster
-    a = 0.  # total hight=2*ahoehe
-    b = 1.8285  # total width =2*b
-    c = 0.0
+    a = 0.  # total hight=2*ahoehe alters y
+    b = 1.8285  # total width =2*b  alters x
+    c = 0.0     # alters z
     # central point
     x = -0.6
     y = 0.1
@@ -169,7 +183,7 @@ if __name__ == '__main__':
               0.886761904761907, 0.88921553884712, 0.891669172932333, 0.894122807017546, 0.896576441102759,
               0.899030075187972, 0.901483709273185, 0.903937343358399, 0.906390977443612]
     for z in z_list:
-        finaleliste.append((480, round(z / c, 2), 5, x, y, z))
+        finaleliste.append((480, z, 5, x, y, z))
     punkte = linienlegen(finaleliste, a, b, c)  # definition der start und endpunkte ANPASSUNG DOMAIN HIER
-    sampledict(punkte)  # definierte punkte werden hier in sampledict geschrieben
+    sampledict(punkte, kind='wing')  # definierte punkte werden hier in sampledict geschrieben
     cwd = os.getcwd()

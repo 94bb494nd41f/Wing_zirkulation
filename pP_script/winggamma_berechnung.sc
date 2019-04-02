@@ -31,6 +31,7 @@ rm -r postProcessing/sampleDict_python_plotlines
 mpirun -np 4 postProcess -parallel -func sampleDict_python_plotlines |tee log.sampling
 
 
+cp pP_script/integration_gamma.py postProcessing/
 cp pP_script/$py2 postProcessing/
 cd postProcessing
 python3 $py2

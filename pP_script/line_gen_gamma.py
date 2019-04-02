@@ -7,11 +7,11 @@ from linge_gen_wing_gamma import sampledict
 
 if __name__ == '__main__':
     finaleliste=[]
-    c = 1.2192
+    #chord = 1.2192
     # width and hight of fenster
-    a = 0.1  # total hight=2*ahoehe
-    b = 0.0  # total width =2*b
-    c = a
+    a = 0.1  # total hight=2*ahoehe alters y
+    b = 0.0  # total width =2*b alters x
+    c = a       # alters z
     # central point
     y = 0.0
     z = 0.8
@@ -21,7 +21,7 @@ if __name__ == '__main__':
     for x in x_list:
         finaleliste.append((480, x, 5 , x, y, z))
     punkte=linienlegen(finaleliste, a, b, c)
-    sampledict(punkte)
+    sampledict(punkte, kind='vortex')
     cwd=os.getcwd()
 
 

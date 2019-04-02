@@ -22,6 +22,7 @@ rm -r /system/sampleDict_python_plotlines
 #mkdir Auswertungsdaten
 cd ..
 
+cp pP_script/linge_gen_wing_gamma.py postProcessing/
 cp pP_script/$py1 postProcessing/
 cd postProcessing
 python3 $py1 |tee log.linegeneration
