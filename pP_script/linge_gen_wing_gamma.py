@@ -3,7 +3,7 @@
 import os
 
 
-def linienlegen(finaleliste, a, b, c):
+def linienlegen(finaleliste, a, b, c, kind):
     punkte = []
     for letztereintrag in finaleliste:
         # min hight: delta Y_min:0.211=sin(10 deg) *1.21921 ->a=0.1059
@@ -17,10 +17,18 @@ def linienlegen(finaleliste, a, b, c):
         y = letztereintrag[4]
         z = letztereintrag[5]
         # linie ergibt sich aus start(bspw:y-b) und ende (bspw. x+b)
-        punkte.append((x - b, y - a, z - c, x + b, y - a, z + c, str(c_stern) + '_1'))  # senkrechter schnitt fuer chow
-        punkte.append((x + b, y - a, z + c, x + b, y + a, z + c, str(c_stern) + '_2'))
-        punkte.append((x + b, y + a, z + c, x - b, y + a, z - c, str(c_stern) + '_3'))
-        punkte.append((x - b, y + a, z - c, x - b, y - a, z - c, str(c_stern) + '_4'))
+        if 'wing' in kind:
+            punkte.append((x - b, y - a, z, x - b, y + a, z, str(c_stern) + '_1'))
+            punkte.append((x - b, y + a, z, x + b, y + a, z, str(c_stern) + '_2'))
+            punkte.append((x + b, y + a, z, x + b, y - a, z, str(c_stern) + '_3'))
+            punkte.append((x + b, y - a, z, x - b, y - a, z - c, str(c_stern) + '_4'))
+        if 'vortex' in kind:
+            punkte.append((x, y - a, z - c, x, y + a, z - c, str(c_stern) + '_1'))
+            punkte.append((x, y + a, z - c, x, y + a, z + c, str(c_stern) + '_2'))
+            punkte.append((x, y + a, z + c, x, y - a, z + c, str(c_stern) + '_3'))
+            punkte.append((x, y - a, z + c, x, y - a, z - c, str(c_stern) + '_4'))
+
+
     return (punkte)
 
 
@@ -184,6 +192,7 @@ if __name__ == '__main__':
               0.899030075187972, 0.901483709273185, 0.903937343358399, 0.906390977443612]
     for z in z_list:
         finaleliste.append((480, z, 5, x, y, z))
-    punkte = linienlegen(finaleliste, a, b, c)  # definition der start und endpunkte ANPASSUNG DOMAIN HIER
-    sampledict(punkte, kind='wing')  # definierte punkte werden hier in sampledict geschrieben
+    kind='wing'
+    punkte = linienlegen(finaleliste, a, b, c, kind)  # definition der start und endpunkte ANPASSUNG DOMAIN HIER
+    sampledict(punkte, kind)  # definierte punkte werden hier in sampledict geschrieben
     cwd = os.getcwd()
