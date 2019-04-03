@@ -111,6 +111,7 @@ if __name__ == '__main__':
     # width and hight of fenster
     a = 0.  # total hight=2*ahoehe alters y
     b = 1.8285  # total width =2*b  alters x
+    # not needed for wing gamma calculation
     c = 0.0     # alters z
     # central point
     x = -0.6

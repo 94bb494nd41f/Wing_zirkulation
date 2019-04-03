@@ -11,8 +11,10 @@ if __name__ == '__main__':
     #chord = 1.2192
     # width and hight of fenster
     a = 0.1  # total hight=2*ahoehe alters y
+    c = a  # alters z
+    # not needed for calculation of vortex gamma
     b = 0.0  # total width =2*b alters x
-    c = a       # alters z
+
     # central point
     y = 0.0
     z = 0.8
