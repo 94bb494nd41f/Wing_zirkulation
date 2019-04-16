@@ -6,17 +6,16 @@ from numpy import genfromtxt
 # os.system('postProcess -func sampleDict_plane_U')
 
 def Einlesen1(plotkind):
-    cwd=os.getcwd()
+    cwd = os.getcwd()
     print('\n das ist die cwd:\n ', cwd)
 
-
     os.chdir(cwd+'/sampleDict_plane_vorticity')
-    list_timesteps=os.listdir(os.getcwd())
+    list_timesteps = os.listdir(os.getcwd())
     print('Timesteps', list_timesteps)
     # get latestTimestep
     latest_timestep = max([int(i) for i in list_timesteps])
     print('latest_timestep:', latest_timestep)
-    samplewd=os.getcwd()
+    samplewd = os.getcwd()
     #  itterating through every timestep
     for x_dir in list_timesteps[:]:
         #  print('xdir', x_dir)
@@ -27,7 +26,8 @@ def Einlesen1(plotkind):
             if filename[0] == 'v':
                 # x  y  z  vorticity_x  vorticity_y  vorticity_z ndarray
                 vorticity_1 = np.genfromtxt(str(filename), skip_header=2, dtype=float)
-    return(vorticity_1)
+    os.chdir(cwd)
+    return vorticity_1
 
 def find_max(array):
     # x  y  z  vorticity_x  vorticity_y  vorticity_z ndarray
@@ -38,7 +38,65 @@ def find_max(array):
             max_line=i
     v_xyz_max_real = math.sqrt(max_line.item(3)**2 + max_line.item(4)**2 + max_line.item(5)**2)
 
-    return(v_xyz_max_real, max_line)
+    return v_xyz_max_real, max_line
+
+def sampledict (punkte):
+    cwd = os.getcwd()
+    print(cwd)
+    # os.path.abspath(os.path.join(__file__ ,"../.."))
+    # os.chdir('..')
+    # os.chdir('..')
+    os.chdir('..')
+    os.chdir(os.getcwd() + '/system/')
+    # print(os.getcwd())
+    f = open('sampleDict_python_plotlines', 'w')
+    # f.write('\\\\    File to get lines for calculation of gamma\n \n')
+    # schreiben des Openfoamheaders
+    f.write('FoamFile\n'
+            '{\n'
+            'version\t2.0;\n'
+            'format\tascii;\n'
+            'class\tdictionary;\n'
+            'object\tsampleDict;\n'
+            '}\n\n\n')
+    # schreiben settings für sampleDict
+    f.write('type sets;\n libs    ("libsampling.so");\n setFormat  raw;\n interpolationScheme cellPoint;\n  \
+    writeControl writeTime;\n startTime latestTime;\ntimeInterval 1;\nfields (U);\n sets \n( \n')
+
+    # schreiben der auszulesenden lines
+    n = 0
+    for i in punkte[:]:
+        # print('i,punkte',i)
+        # Welche liniennummer
+
+        line_nummer = i[6]
+        # kontrollausgabe
+        # print('i:', i[6])
+        x_1 = i[0]
+        y_1 = i[1]
+        z_1 = i[2]
+        x_2 = i[3]
+        y_2 = i[4]
+        z_2 = i[5]
+        # kontrollausgaben
+        # print('c*'+str(c)+'_'+str(line_nummer)+'\n')
+        # print('c*' + i[6] + '_' + str(line_nummer) + '\n')
+
+
+        f.write('c' + str('1') + '_' + str(line_nummer) + '\n'
+                                                          ' {\n'
+                                                          ' type uniform;\n'
+                                                          ' axis xyz;\n'
+                                                          ' start ( ' + str(x_1) + ' ' + str(y_1) + ' ' + str(
+            z_1) + ');\n'
+                   ' end (' + str(x_2) + ' ' + str(y_2) + ' ' + str(z_2) + ');\n'
+                                                                           ' nPoints \t 1000;\n'
+                                                                           '}\n\n')
+
+    f.write(');')
+    f.close()
+    os.chdir(cwd)
+    return()
 
 if __name__ == '__main__':
     array=Einlesen1(plotkind='wing')
@@ -95,7 +153,7 @@ if __name__ == '__main__':
     y_e = y_core + a_2 * fenster_a + b_2 * fenster_b
     z_e = z_core + a_3 * fenster_a + b_3 * fenster_b
 
-    punkte.append((x_s, y_s ,z_s, x_e, y_e, z_e))
+    punkte.append((x_s, y_s ,z_s, x_e, y_e, z_e, 1))
 
     # 2
     x_s = x_core + a_1 * fenster_a + b_1 * fenster_b
@@ -106,7 +164,7 @@ if __name__ == '__main__':
     y_e = y_core - a_2 * fenster_a + b_2 * fenster_b
     z_e = z_core - a_3 * fenster_a + b_3 * fenster_b
 
-    punkte.append((x_s, y_s, z_s, x_e, y_e, z_e))
+    punkte.append((x_s, y_s, z_s, x_e, y_e, z_e, 2))
 
     # 3
     x_s = x_core - a_1 * fenster_a + b_1 * fenster_b
@@ -117,7 +175,7 @@ if __name__ == '__main__':
     y_e = y_core - a_2 * fenster_a - b_2 * fenster_b
     z_e = z_core - a_3 * fenster_a - b_3 * fenster_b
 
-    punkte.append((x_s, y_s, z_s, x_e, y_e, z_e))
+    punkte.append((x_s, y_s, z_s, x_e, y_e, z_e, 3))
 
     # 4
     x_s = x_core - a_1 * fenster_a - b_1 * fenster_b
@@ -128,25 +186,9 @@ if __name__ == '__main__':
     y_e = y_core + a_2 * fenster_a - b_2 * fenster_b
     z_e = z_core + a_3 * fenster_a - b_3 * fenster_b
 
-    punkte.append((x_s, y_s, z_s, x_e, y_e, z_e))
+    punkte.append((x_s, y_s, z_s, x_e, y_e, z_e, 4))
 
+    sampledict(punkte)
 
-
-
-
-
-
-
-
-
-    punkte.append((x - a_1*fenster_a , y - a_2*fenster_a, z - a_3*fenster_a,       x - , y + a, z, str(c_stern) + '_1'))
-
-
-
-    punkte.append((x - b, y - a, z, x - b, y + a, z, str(c_stern) + '_1'))
-    punkte.append((x - b, y + a, z, x + b, y + a, z, str(c_stern) + '_2'))
-    punkte.append((x + b, y + a, z, x + b, y - a, z, str(c_stern) + '_3'))
-    punkte.append((x + b, y - a, z, x - b, y - a, z - c, str(c_stern) + '_4'))
-
-    print('end')
+    print('\n \n -------------------------end---------------------------------------')
 
