@@ -5,6 +5,16 @@ import numpy as np
 from numpy import genfromtxt
 # os.system('postProcess -func sampleDict_plane_U')
 
+# norming vector to a length
+def length_norm(x, y, z, length):
+    f = length/math.sqrt(
+        x**2 + y**2 + z**2
+    )
+    x = f*x
+    y = f*y
+    z = f*z
+    return x, y, z
+
 def Einlesen1(plotkind):
     cwd = os.getcwd()
     print('\n das ist die cwd:\n ', cwd)
@@ -37,7 +47,7 @@ def find_max(array):
         if v_xyz <= v_xyz_new:
             max_line=i
     v_xyz_max_real = math.sqrt(max_line.item(3)**2 + max_line.item(4)**2 + max_line.item(5)**2)
-
+    print('maximaler vortexdings', v_xyz_max_real, 'corresponding line:', max_line)
     return v_xyz_max_real, max_line
 
 def sampledict (punkte):
@@ -82,7 +92,6 @@ def sampledict (punkte):
         # print('c*'+str(c)+'_'+str(line_nummer)+'\n')
         # print('c*' + i[6] + '_' + str(line_nummer) + '\n')
 
-
         f.write('c' + str('1') + '_' + str(line_nummer) + '\n'
                                                           ' {\n'
                                                           ' type uniform;\n'
@@ -97,6 +106,7 @@ def sampledict (punkte):
     f.close()
     os.chdir(cwd)
     return()
+
 
 if __name__ == '__main__':
     array=Einlesen1(plotkind='wing')
@@ -120,71 +130,61 @@ if __name__ == '__main__':
     a_1 = c_1
     a_2 = c_2
     b_2 = c_2
+
     # calculate missing parts of vectors
     a_3 = -(c_1**2 + c_2**2)/c_3
     b_1 = -(c_2**2 + c_3**2)/c_1
     b_3 = -(c_1**2 + c_2**2)/a_3
-    # norm vectors
-    norm = max(a_1, a_2, a_3)
-    a_1 = a_1/norm
-    a_2 = a_2 / norm
-    a_3 = a_3 / norm
 
-    norm = max(b_1, b_2, b_3)
-    b_1 = b_1 / norm
-    b_2 = b_2 / norm
-    b_3 = b_3 / norm
+    # norm vectors so a defined length
+    length = 0.25
+    a_1, a_2, a_3 = length_norm(a_1, a_2, a_3, length)
+    b_1, b_2, b_3 = length_norm(b_1, b_2, b_3, length)
+    c_1, c_2, c_3 = length_norm(c_1, c_2, c_3, length)
 
-    norm = max(c_1, c_2, c_3)
-    c_1 = c_1 / norm
-    c_2 = c_2 / norm
-    c_3 = c_3 / norm
-
-    fenster_a = 0.5
-    fenster_b = 0.5
     punkte = []
     # generate points
     # 1
-    x_s = x_core + a_1*fenster_a - b_1*fenster_b
-    y_s = y_core + a_2*fenster_a - b_2*fenster_b
-    z_s = z_core + a_3*fenster_a - b_3*fenster_b
+    x_s = x_core + a_1 - b_1
+    y_s = y_core + a_2 - b_2
+    z_s = z_core + a_3 - b_3
 
-    x_e = x_core + a_1 * fenster_a + b_1 * fenster_b
-    y_e = y_core + a_2 * fenster_a + b_2 * fenster_b
-    z_e = z_core + a_3 * fenster_a + b_3 * fenster_b
+    x_e = x_core + a_1 + b_1
+    y_e = y_core + a_2 + b_2
+    z_e = z_core + a_3 + b_3
 
-    punkte.append((x_s, y_s ,z_s, x_e, y_e, z_e, 1))
+    punkte.append((x_s, y_s,z_s, x_e, y_e, z_e, 1))
 
     # 2
-    x_s = x_core + a_1 * fenster_a + b_1 * fenster_b
-    y_s = y_core + a_2 * fenster_a + b_2 * fenster_b
-    z_s = z_core + a_3 * fenster_a + b_3 * fenster_b
+    x_s = x_core + a_1 + b_1
+    y_s = y_core + a_2 + b_2
+    z_s = z_core + a_3 + b_3
 
-    x_e = x_core - a_1 * fenster_a + b_1 * fenster_b
-    y_e = y_core - a_2 * fenster_a + b_2 * fenster_b
-    z_e = z_core - a_3 * fenster_a + b_3 * fenster_b
+    x_e = x_core - a_1 + b_1
+    y_e = y_core - a_2 + b_2
+    z_e = z_core - a_3 + b_3
 
     punkte.append((x_s, y_s, z_s, x_e, y_e, z_e, 2))
 
     # 3
-    x_s = x_core - a_1 * fenster_a + b_1 * fenster_b
-    y_s = y_core - a_2 * fenster_a + b_2 * fenster_b
-    z_s = z_core - a_3 * fenster_a + b_3 * fenster_b
+    x_s = x_core - a_1 + b_1
+    y_s = y_core - a_2 + b_2
+    z_s = z_core - a_3 + b_3
 
-    x_e = x_core - a_1 * fenster_a - b_1 * fenster_b
-    y_e = y_core - a_2 * fenster_a - b_2 * fenster_b
-    z_e = z_core - a_3 * fenster_a - b_3 * fenster_b
+    x_e = x_core - a_1 - b_1
+    y_e = y_core - a_2 - b_2
+    z_e = z_core - a_3 - b_3
 
     punkte.append((x_s, y_s, z_s, x_e, y_e, z_e, 3))
 
     # 4
-    x_s = x_core - a_1 * fenster_a - b_1 * fenster_b
-    y_s = y_core - a_2 * fenster_a - b_2 * fenster_b
-    z_s = z_core - a_3 * fenster_a - b_3 * fenster_b
+    x_s = x_core - a_1 - b_1
+    y_s = y_core - a_2 - b_2
+    z_s = z_core - a_3 - b_3
 
-    x_e = x_core + a_1 * fenster_a - b_1 * fenster_b
-    y_e = y_core + a_2 * fenster_a - b_2 * fenster_b
-    z_e = z_core + a_3 * fenster_a - b_3 * fenster_b
+    x_e = x_core + a_1 - b_1
+    y_e = y_core + a_2 - b_2
+    z_e = z_core + a_3 - b_3
 
     punkte.append((x_s, y_s, z_s, x_e, y_e, z_e, 4))
 
