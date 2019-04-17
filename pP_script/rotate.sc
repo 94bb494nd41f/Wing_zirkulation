@@ -11,11 +11,11 @@ py2=rot_zirkulation.py
 
 cd .. #needs to be run from case
 # calculate vorticity
-mpirun -np $cpus postProcess -func vorticity -parallel -latestTime |tee log.calculation_vorticity
+#mpirun -np $cpus postProcess -func vorticity -parallel -latestTime |tee log.calculation_vorticity
 
 
 # sample vortex plane
-mpirun -np $cpus postProcess -func sampleDict_plane_vorticity -parallel -latestTime |tee log.vortex_plane
+#mpirun -np $cpus postProcess -func sampleDict_plane_vorticity -parallel -latestTime |tee log.vortex_plane
 
 #cd pP_script #  tools  need to be run from this folder
 
@@ -26,7 +26,7 @@ python3 $py1 |tee log.linegeneration
 
 cd ..
 #read out defined lines
-mpirun -np $count_proc postProcess -parallel -func sampleDict_python_plotlines |tee log.sampling
+mpirun -np $cpus postProcess -parallel -func sampleDict_python_plotlines |tee log.sampling
 
 
 cp pP_script/$py2 postProcessing/

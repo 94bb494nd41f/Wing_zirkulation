@@ -39,16 +39,26 @@ def Einlesen1(plotkind):
     os.chdir(cwd)
     return vorticity_1
 
+
 def find_max(array):
     # x  y  z  vorticity_x  vorticity_y  vorticity_z ndarray
-    v_xyz = array.item((0, 3))+ array.item((0, 4)) + array.item((0, 5))
+    # init values
+    v_xyz_max = array.item((0, 3))**2 + array.item((0, 4))**2 + array.item((0, 5))**2
+    max_line = array.item(0)
     for i in array:
-        v_xyz_new=i.item(3)**2 + i.item(4)**2 + i.item(5)**2
-        if v_xyz <= v_xyz_new:
-            max_line=i
-    v_xyz_max_real = math.sqrt(max_line.item(3)**2 + max_line.item(4)**2 + max_line.item(5)**2)
+        v_xyz_new = i.item(3)**2 + i.item(4)**2 + i.item(5)**2
+        if v_xyz_new > v_xyz_max:
+            max_line = i
+            v_xyz_max = v_xyz_new
+            #print('current_vor:', v_xyz_new, 'max_vor', v_xyz_max)
+            #print('\n i\n', i, 'max_line \n', max_line)
+
+    v_xyz_max_real = math.sqrt(
+        max_line.item(3)**2 + max_line.item(4)**2 + max_line.item(5)**2
+    )
     print('maximaler vortexdings', v_xyz_max_real, 'corresponding line:', max_line)
     return v_xyz_max_real, max_line
+
 
 def sampledict (punkte):
     cwd = os.getcwd()
@@ -110,7 +120,7 @@ def sampledict (punkte):
 
 if __name__ == '__main__':
     array=Einlesen1(plotkind='wing')
-    max_vor, max_line=find_max(array)
+    max_vor, max_line = find_max(array)
     # max_vor -> max vorticity
     # max line: x,y,z,v_x,v_y,v_z
     x_core = max_line.item(0)
