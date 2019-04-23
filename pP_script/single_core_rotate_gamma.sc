@@ -10,6 +10,7 @@ py2=rot_zirkulation.py
 
 
 cd .. #needs to be run from case
+rm -r postProcessing
 # calculate vorticity
 postProcess -func vorticity -latestTime |tee log.calculation_vorticity
 

@@ -1,12 +1,12 @@
 import os
 import math
-import pandas as pd
+# import pandas as pd
 import numpy as np
-from numpy import genfromtxt
+# from numpy import genfromtxt
 # os.system('postProcess -func sampleDict_plane_U')
 
-# norming vector to a length
-def length_norm(x, y, z, length):
+
+def length_norm(x, y, z, length): # norming vector to a length
     f = length/math.sqrt(
         x**2 + y**2 + z**2
     )
@@ -14,6 +14,7 @@ def length_norm(x, y, z, length):
     y = f*y
     z = f*z
     return x, y, z
+
 
 def Einlesen1(plotkind):
     cwd = os.getcwd()
@@ -56,8 +57,71 @@ def find_max(array):
     v_xyz_max_real = math.sqrt(
         max_line.item(3)**2 + max_line.item(4)**2 + max_line.item(5)**2
     )
-    print('maximaler vortexdings', v_xyz_max_real, 'corresponding line:', max_line)
     return v_xyz_max_real, max_line
+
+
+def avg_vorticity(array, max_line):
+    bandbreite = 0.1       # diameter or sphere projected onto the plane over which the average is taken
+    n = 0
+    avg_list = []
+    #np.array(avg_list,)
+    avg_x = 0
+    avg_y = 0
+    avg_z = 0
+    sig_x = np.sign(max_line.item(0))
+    sig_y = np.sign(max_line.item(1))
+    sig_z = np.sign(max_line.item(2))
+
+    # determine boundaries corresponding to the signum of the max_line coordinate
+    if sig_x == -1:
+        x_up = max_line.item(0) * (1 - bandbreite)
+        x_low = max_line.item(0) * (1 + bandbreite)
+    if sig_x == 1:
+        x_up = max_line.item(0) * (1 + bandbreite)
+        x_low = max_line.item(0) * (1 - bandbreite)
+
+    if sig_y == -1:
+        y_up = max_line.item(1) * (1 - bandbreite)
+        y_low = max_line.item(1) * (1 + bandbreite)
+    if sig_y == 1:
+        y_up = max_line.item(1) * (1 + bandbreite)
+        y_low = max_line.item(1) * (1 - bandbreite)
+
+    if sig_z == -1:
+        z_up = max_line.item(2) * (1-bandbreite)
+        z_low = max_line.item(2) * (1+bandbreite)
+    if sig_z == 1:
+        z_up = max_line.item(2) * (1+bandbreite)
+        z_low = max_line.item(2) * (1-bandbreite)
+
+    for i in array:
+        if x_low < i.item(0) < x_up:
+            if y_low < i.item(1) < y_up:
+                if z_low < i.item(2) < z_up:
+                    n += 1
+
+                    avg_list.append((i.item(3), i.item(4), i.item(5)))
+
+    frac = 1/(len(avg_list)-1)
+    avg_list = np.asanyarray(avg_list)
+
+    for i in avg_list:      #sum for average
+        avg_x += i.item(0)
+        avg_y += i.item(1)
+        avg_z += i.item(2)
+    # multiply with 1/n
+    avg_x = frac * avg_x
+    avg_y = frac * avg_y
+    avg_z = frac * avg_z
+
+    avg_vort = math.sqrt(
+        (avg_x)**2 +
+        (avg_y)**2 +
+        (avg_z)**2
+    )
+    n_line = (max_line.item(0), max_line.item(1), max_line.item(2), avg_x, avg_y, avg_z)
+    n_line = np.asanyarray(n_line)
+    return avg_vort, n_line
 
 
 def sampledict (punkte):
@@ -119,35 +183,55 @@ def sampledict (punkte):
 
 
 if __name__ == '__main__':
-    array=Einlesen1(plotkind='wing')
+    array = Einlesen1(plotkind='wing')
     max_vor, max_line = find_max(array)
+    max_vor, max_line = avg_vorticity(array, max_line)
+
+    # max_vor not needed
+
+    print('maximaler vortexdings', max_vor, 'corresponding line:', max_line)
+
     # max_vor -> max vorticity
     # max line: x,y,z,v_x,v_y,v_z
     x_core = max_line.item(0)
     y_core = max_line.item(1)
     z_core = max_line.item(2)
+    v_x = max_line.item(3)
+    v_y = max_line.item(4)
+    v_z = max_line.item(5)
 
     # calc vector, alpha: x-axis and vector, beta: y-axis and vector, eta: z-axis and vecotr
-    alpha_cos = max_line.item(3)/max_vor
-    beta_cos = max_line.item(4)/max_vor
-    eta_cos = max_line.item(5)/max_vor
+    max_vor = math.sqrt(
+        v_x**2 + v_y**2 + v_z**2
+    )
+    alpha_cos = v_x/max_vor
+    beta_cos = v_y/max_vor
+    eta_cos = v_z/max_vor
     # defining plane which is described by the vector a and b. a, b, c are orthogonal to each other. c is the vector
     # of the vortexcore
     c_1 = alpha_cos
     c_2 = beta_cos
     c_3 = eta_cos
     # confine system of equations
+    print('c1,c2,c3: \t', c_1, c_2, c_3)
+
     a_1 = c_1
     a_2 = c_2
     b_2 = c_2
 
-    # calculate missing parts of vectors
+     # calculate missing parts of vectors
     a_3 = -(c_1**2 + c_2**2)/c_3
-    b_1 = -(c_2**2 + c_3**2)/c_1
-    b_3 = -(c_1**2 + c_2**2)/a_3
+    b_1 = -(c_2**2)/c_1
+
+    b_3 = (c_2**2 - c_2 * b_2) / (c_3 - a_3) # = 0, not needed
+    print('\n c_i colinear to vortex, a,c,b are orthogonal to eachother\n')
+    print('c1,c2,c3: \t', c_1, c_2, c_3)
+    print('a1,a2,a3: \t', a_1, a_2, a_3)
+    print('b1,b2,b3: \t', b_1, b_2, b_3)
 
     # norm vectors so a defined length
-    length = 0.25
+    real_length = 0.4
+    length = real_length / 2
     a_1, a_2, a_3 = length_norm(a_1, a_2, a_3, length)
     b_1, b_2, b_3 = length_norm(b_1, b_2, b_3, length)
     c_1, c_2, c_3 = length_norm(c_1, c_2, c_3, length)

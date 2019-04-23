@@ -7,21 +7,19 @@
 
 #Die gesampelten Lines werden in "integration_gamma.py" eingelesen, mit Trapez integriert und mit matplot lib geplottet. Die Ausgabe erfolgt einmal über Terminal (->plt.show()) und als .pdf in  /postProcessing/sampleDict_python_plotlines/<latest Timestep>/plots/c_gamma*.pdf
 
+#
 
-echo "needs to be run from inside pP_script!
-Readme:
-        needs Python 3.6 (at least 3, i think)
-        Error: no module matplotlib found? install matplotlib using 'python3 -m 	install matplotlib'
-        Error: no moudle tkinter found? install tkinter using 'sudo apt-get install 	python3-tk'
-        worked for me \n \n \n \n"
 
-#first python tool
+
+# python tools
 py1=line_gen_gamma.py
 py2=integration_gamma.py
 #rm log*
-rm -r /system/sampleDict_python_plotlines
+
 #mkdir Auswertungsdaten
 cd ..
+rm -r /system/sampleDict_python_plotlines
+rm -r postProcessing
 
 cp pP_script/linge_gen_wing_gamma.py postProcessing/
 cp pP_script/$py1 postProcessing/
@@ -30,8 +28,10 @@ python3 $py1 |tee log.linegeneration
 
 cd ..
 rm -r postProcessing/sampleDict_python_plotlines
-mpirun -np 4 postProcess -parallel -func sampleDict_python_plotlines |tee log.sampling
-
+#parallel
+#mpirun -np 4 postProcess -parallel -func sampleDict_python_plotlines |tee log.sampling
+# singleCore
+postProcess -parallel -func sampleDict_python_plotlines |tee log.sampling
 
 cp pP_script/$py2 postProcessing/
 cd postProcessing

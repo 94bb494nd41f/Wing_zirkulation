@@ -5,6 +5,7 @@ import numpy as np
 import math
 
 
+
 def integration(data_array):
     #############################################################
     # get orientation of vector and norm it to one to later calculate the velocity along the line
@@ -13,41 +14,73 @@ def integration(data_array):
     v_2 = data_array.item((1, 1)) - data_array.item((0, 1))
     v_3 = data_array.item((1, 2)) - data_array.item((0, 2))
 
-    norm = max(v_1, v_2, v_3)
-    v_1 = v_1 / norm
-    v_2 = v_2 / norm
-    v_3 = v_3 / norm
-
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     # Watch out for len_array already reduced by one!
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     len_array = len(data_array) - 1
     summe = 0.0
 
-    h = (
-                (data_array.item((len_array, 0))) ** 2
-                + (data_array.item((len_array, 1))) ** 2
-                + (data_array.item((len_array, 2))) ** 2
-                - (data_array.item((0, 0))) ** 2
-                - (data_array.item((0, 1))) ** 2
-                - (data_array.item((0, 2))) ** 2
-    )         \
-    /float(len_array)
-    h = math.sqrt(9)
-########################################################################################################
     # inner part
     for i in range(1, len_array - 0):
-        #  mydata: X|y|z|ux|uy|uz
-        summe += h * (data_array.item((i, 3)) * v_1 + data_array.item((i, 4)) * v_2 + data_array.item((i, 5)) * v_3)
-########################################################################################################
-        # beginning and end
-    summe += h * 0.5 * (
-            (data_array.item((0, 3)) * v_1 + data_array.item((0, 4)) * v_2 + data_array.item((0, 5)) * v_3)
-            +
-            (data_array.item((len_array, 3)) * v_1 + data_array.item((len_array, 4)) * v_2 + data_array.item(
-                (len_array, 5)) * v_3)
+        summe += v_1 * data_array.item((i, 3)) + \
+                 v_2 * data_array.item((i, 4)) + \
+                 v_3 * data_array.item((i, 5))
+    # first item
+    summe += 0.5 * (
+            v_1 * data_array.item((0, 3)) +
+            v_2 * data_array.item((0, 4)) +
+            v_3 * data_array.item((0, 5))
     )
-    return(summe)
+
+    # last item
+    summe += 0.5 * (
+            v_1 * data_array.item((len_array, 3)) +
+            v_2 * data_array.item((len_array, 4)) +
+            v_3 * data_array.item((len_array, 5))
+    )
+    return summe
+
+
+# def intalt():
+#
+#     norm = max(v_1, v_2, v_3)
+#     v_1 = v_1 / norm
+#     v_2 = v_2 / norm
+#     v_3 = v_3 / norm
+#
+#     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#     # Watch out for len_array already reduced by one!
+#     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#     len_array = len(data_array) - 1
+#     summe = 0.0
+#
+#     h = (
+#                 (data_array.item((len_array, 0)) - data_array.item((0, 0))) ** 2
+#                 + (data_array.item((len_array, 1)) - data_array.item((0, 1))) ** 2
+#                 + (data_array.item((len_array, 2)) - data_array.item((0, 2))) ** 2
+#         ) \
+#         / float(len_array)
+#     h = math.sqrt(h)
+#     ########################################################################################################
+#     # inner part
+#     for i in range(1, len_array - 0):
+#         #  mydata: X|y|z|ux|uy|uz
+#         summe += h * math.sqrt(
+#             (data_array.item((i, 3)) * v_1)**2 + (data_array.item((i, 4)) * v_2)**2 + (data_array.item((i, 5)) * v_3)
+#     ########################################################################################################
+#     # beginning and end
+#     summe += h * 0.5 * (
+#             math.sqrt(
+#                 (data_array.item((0, 3)) * v_1) ** 2 + (data_array.item((0, 4)) * v_2) ** 2 + (
+#                             data_array.item((0, 5)) * v_3) ** 2
+#             )
+#             +
+#             math.sqrt((data_array.item((len_array, 3)) * v_1) ** 2 + (data_array.item((len_array, 4)) * v_2) ** 2 + (
+#                     data_array.item((len_array, 5)) * v_3) ** 2
+#                       )
+#     )
+#
+#     return (summe)
 
 
 # load data
@@ -148,11 +181,12 @@ def Einlesen():
                     summe_4 = integration(mydata_4)
                     gamma_total = summe_1 + summe_2 + summe_3 + summe_4
                     #  mydata: X|y|z|ux|uy|uz
-                    c_gamma.append((mydata_1.item((0, 0)), gamma_total))
+                    print('gamma_total', gamma_total)
+                    # c_gamma.append((mydata_1.item((0, 0)), gamma_total))
 
-        #plotting(c_gamma, )
+        # plotting(c_gamma, )
         os.chdir(cwd)
-    return (c_gamma)
+    return (gamma_total)
 
 
 if __name__ == '__main__':
