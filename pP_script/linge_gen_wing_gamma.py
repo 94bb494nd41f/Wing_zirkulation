@@ -18,11 +18,18 @@ def linienlegen(finaleliste, a, b, c, kind):
         z = letztereintrag[5]
         # linie ergibt sich aus start(bspw:y-b) und ende (bspw. x+b)
         if 'wing' in kind:
+            if a==0 or b==0:
+                print('\n Fenstergroesse zu klein, abbruch\n \n')
+                return ()
             punkte.append((x - b, y - a, z, x - b, y + a, z, str(c_stern) + '_1'))
             punkte.append((x - b, y + a, z, x + b, y + a, z, str(c_stern) + '_2'))
             punkte.append((x + b, y + a, z, x + b, y - a, z, str(c_stern) + '_3'))
-            punkte.append((x + b, y - a, z, x - b, y - a, z - c, str(c_stern) + '_4'))
+            punkte.append((x + b, y - a, z, x - b, y - a, z, str(c_stern) + '_4'))
+
         if 'vortex' in kind:
+            if a==0 or c==0:
+                print('\n Fenstergroesse zu klein, abbruch\n \n')
+                return ()
             punkte.append((x, y - a, z - c, x, y + a, z - c, str(c_stern) + '_1'))
             punkte.append((x, y + a, z - c, x, y + a, z + c, str(c_stern) + '_2'))
             punkte.append((x, y + a, z + c, x, y - a, z + c, str(c_stern) + '_3'))
@@ -98,6 +105,7 @@ def sampledict(punkte, kind):
 
     f.write(');')
     f.close()
+    print('sample_lines in:', os.getcwd())
     os.chdir(cwd)
     return()
 
@@ -109,7 +117,7 @@ if __name__ == '__main__':
     finaleliste = []
     chord = 0.91
     # width and hight of fenster
-    a = 0.  # total hight=2*ahoehe alters y
+    a = 0.25  # total hight=2*ahoehe alters y
     b = 1.8285  # total width =2*b  alters x
     # not needed for wing gamma calculation
     c = 0.0     # alters z

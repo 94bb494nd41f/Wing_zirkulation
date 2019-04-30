@@ -5,7 +5,7 @@ from integration_gamma import Einlesen
 if __name__ == '__main__':
     print('\n \n IMPORTANT: \'integration_gamma.py\' needs to be in same dir! \n \n')
     plotkind = 'wing'
-    c_gamma=Einlesen(plotkind)
+    c_gamma = Einlesen(plotkind)
     # integration over wing
     h = (c_gamma[len(c_gamma) - 1][0] - c_gamma[0][0]) / float(len(c_gamma) - 1)
     g_wing=0

@@ -8,12 +8,6 @@
 #Die gesampelten Lines werden in "integration_gamma.py" eingelesen, mit Trapez integriert und mit matplot lib geplottet. Die Ausgabe erfolgt einmal über Terminal (->plt.show()) und als .pdf in  /postProcessing/sampleDict_python_plotlines/<latest Timestep>/plots/c_gamma*.pdf
 
 
-echo "needs to be run from inside pP_script!
-Readme:
-	needs Python 3.6 (at least 3, i think)
-	Error: no module matplotlib found? install matplotlib using 'python3 -m 	install matplotlib'
-	Error: no moudle tkinter found? install tkinter using 'sudo apt-get install 	python3-tk'
-	worked for me"
 #first python tool
 py1=linge_gen_wing_gamma.py
 py2=wingintegration_gamma.py
@@ -23,6 +17,7 @@ rm -r /system/sampleDict_python_plotlines
 cd ..
 
 cp pP_script/$py1 postProcessing/
+cp pP_script/$py2 postProcessing/
 cd postProcessing
 python3 $py1
 
@@ -32,6 +27,7 @@ mpirun -np 4 postProcess -parallel -func sampleDict_python_plotlines |tee log.sa
 
 
 cp pP_script/integration_gamma.py postProcessing/
+cp pP_script/$py1 postProcessing/
 cp pP_script/$py2 postProcessing/
 cd postProcessing
 python3 $py2
