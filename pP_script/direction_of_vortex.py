@@ -60,8 +60,7 @@ def find_max(array):
     return v_xyz_max_real, max_line
 
 
-def avg_vorticity(array, max_line):
-    bandbreite = 0.1       # diameter or sphere projected onto the plane over which the average is taken
+def avg_vorticity(array, max_line, bandbreite):
     n = 0
     avg_list = []
     #np.array(avg_list,)
@@ -125,6 +124,7 @@ def avg_vorticity(array, max_line):
 
 
 def var_avg_vorticity(array, max_line):
+    # Nur fuer invarianze zu winkel wichtig
     bandbreite = 0.35       # diameter or sphere projected onto the plane over which the average is taken
     n = 0
     obergrenze = 0.7
@@ -257,10 +257,27 @@ def sampledict (punkte):
 
 
 if __name__ == '__main__':
+    # Parameter
+    real_length = 0.4  #absolute groeße des Fensters, ist quadratisch
+    ######################################################
+    #   _________________
+    #   |                |
+    #   |                |
+    #   |        +       |       das soll quadratisch sein
+    #   |                |
+    #   |________________|
+    #    <--------------->
+    #       real_length
+    #
+    #
+    ##############################################################
+
+    bandbreite = 0.1  # diameter or sphere projected onto the plane over which the average is taken
+
     array = Einlesen1(plotkind='wing')
     max_vor, max_line = find_max(array)
-    #max_vor, max_line = avg_vorticity(array, max_line)
-    max_vor, max_line = var_avg_vorticity(array, max_line)
+    max_vor, max_line = avg_vorticity(array, max_line, bandbreite)
+    #max_vor, max_line = var_avg_vorticity(array, max_line)
 
     # max_vor not needed
 
