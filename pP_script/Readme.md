@@ -7,7 +7,7 @@ pP_script/rotate_gamma.sc
 Die Tools müssen aus dem pP_script Ordner mit *./* gestartet werden. Unter Umständen muss vorher noch chmod +x angewandt werden
 
 
-## Zirkulationsauswertung bei Beliebiger Wirbelorientierung
+## Zirkulationsauswertung bei beliebiger Wirbelorientierung
 ### Files:direction_of_vortex.py
 ### Files:rot_zirkulation.py
 ### Files:rotate_gamma.sc
