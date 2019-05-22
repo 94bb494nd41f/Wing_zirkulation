@@ -193,7 +193,7 @@ if __name__ == '__main__':
     print('Bitte README lesen')
     c_gamma = Einlesen()
 
-    print('\n \n -------------------------end---------------------------------------')
+    print('\n \n -------------------------ende---------------------------------------')
 
 
 def integration(data_array):
