@@ -60,7 +60,7 @@ def find_max(array):
     return v_xyz_max_real, max_line
 
 
-def avg_vorticity(array, max_line, bandbreite):
+def avg_vorticity(array, max_line, radius ):
     n = 0
     avg_list = []
     #np.array(avg_list,)
@@ -71,35 +71,25 @@ def avg_vorticity(array, max_line, bandbreite):
     sig_y = np.sign(max_line.item(1))
     sig_z = np.sign(max_line.item(2))
 
-    # determine boundaries corresponding to the signum of the max_line coordinate
-    if sig_x == -1:
-        x_up = max_line.item(0) * (1 - bandbreite)
-        x_low = max_line.item(0) * (1 + bandbreite)
-    if sig_x == 1:
-        x_up = max_line.item(0) * (1 + bandbreite)
-        x_low = max_line.item(0) * (1 - bandbreite)
+    #determine boundaries
+    x_bound = [max_line.item(0) + radius, max_line.item(0) - radius ]
+    x_bound.sort()      # now x_bound=[x_low,x_up]
 
-    if sig_y == -1:
-        y_up = max_line.item(1) * (1 - bandbreite)
-        y_low = max_line.item(1) * (1 + bandbreite)
-    if sig_y == 1:
-        y_up = max_line.item(1) * (1 + bandbreite)
-        y_low = max_line.item(1) * (1 - bandbreite)
+    y_bound = [max_line.item(1) + radius, max_line.item(1) - radius]
+    y_bound.sort()
 
-    if sig_z == -1:
-        z_up = max_line.item(2) * (1-bandbreite)
-        z_low = max_line.item(2) * (1+bandbreite)
-    if sig_z == 1:
-        z_up = max_line.item(2) * (1+bandbreite)
-        z_low = max_line.item(2) * (1-bandbreite)
+    z_bound = [max_line.item(2) + radius, max_line.item(2) - radius]
+    z_bound.sort()
 
     for i in array:
-        if x_low < i.item(0) < x_up:
-            if y_low < i.item(1) < y_up:
-                if z_low < i.item(2) < z_up:
-                    n += 1
-
-                    avg_list.append((i.item(3), i.item(4), i.item(5)))
+        if x_bound[0] < i.item(0) < x_bound[1]:
+            if y_bound[0] < i.item(1) < y_bound[1]:
+                if z_bound[0] < i.item(2) < z_bound[1]:
+                    # every value is now inside a cube, now cancle values out, whose euclidean distance is larger than
+                    # radius. avoid SQRT!
+                    if ((max_line.item(0)-i.item(0))**2+(max_line.item(1)-i.item(1))**2 +(max_line.item(2)-i.item(2))**2) < radius**2:
+                        n += 1
+                        avg_list.append((i.item(3), i.item(4), i.item(5)))
 
     frac = 1/(len(avg_list))
     avg_list = np.asanyarray(avg_list)
@@ -272,11 +262,15 @@ if __name__ == '__main__':
     #
     ##############################################################
 
-    bandbreite = 0.3  # diameter or sphere projected onto the plane over which the average is taken
+    cellsize = 0.0082  # cellsize in core vortex
+
+    cellcount = 20      # calculates with the cellsize to the radius, which is used to average around the maximum
+
+    radius = cellcount * cellsize
 
     array = Einlesen1(plotkind='wing')
     max_vor, max_line = find_max(array)
-    max_vor, max_line = avg_vorticity(array, max_line, bandbreite)
+    max_vor, max_line = avg_vorticity(array, max_line, radius)
     #max_vor, max_line = var_avg_vorticity(array, max_line)
 
     # max_vor not needed
