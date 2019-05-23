@@ -101,7 +101,7 @@ def avg_vorticity(array, max_line, bandbreite):
 
                     avg_list.append((i.item(3), i.item(4), i.item(5)))
 
-    frac = 1/(len(avg_list)-1)
+    frac = 1/(len(avg_list))
     avg_list = np.asanyarray(avg_list)
 
     for i in avg_list:      #sum for average
@@ -272,7 +272,7 @@ if __name__ == '__main__':
     #
     ##############################################################
 
-    bandbreite = 0.1  # diameter or sphere projected onto the plane over which the average is taken
+    bandbreite = 0.3  # diameter or sphere projected onto the plane over which the average is taken
 
     array = Einlesen1(plotkind='wing')
     max_vor, max_line = find_max(array)
