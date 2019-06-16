@@ -19,8 +19,15 @@ def length_norm(x, y, z, length): # norming vector to a length
 def Einlesen1(plotkind):
     cwd = os.getcwd()
     print('\n das ist die cwd:\n ', cwd)
+    t1 = os.path.getctime(cwd + '/sampleDict_plane_vorticity')
+    t2 = os.path.getctime(cwd + '/sampleDict_plane_pressure')
+    if os.path.getctime(cwd + '/sampleDict_plane_vorticity') > os.path.getctime(cwd + '/sampleDict_plane_pressure'):
+        # determine the newest File/ Folder
+        os.chdir(cwd + '/sampleDict_plane_vorticity')
+    elif os.path.getctime(cwd + '/sampleDict_plane_vorticity') < os.path.getctime(cwd + '/sampleDict_plane_pressure'):
+        os.chdir(cwd + '/sampleDict_plane_pressure')
 
-    os.chdir(cwd+'/sampleDict_plane_vorticity')
+
     list_timesteps = os.listdir(os.getcwd())
     print('Timesteps', list_timesteps)
     # get latestTimestep
@@ -37,27 +44,62 @@ def Einlesen1(plotkind):
             if filename[0] == 'v':
                 # x  y  z  vorticity_x  vorticity_y  vorticity_z ndarray
                 vorticity_1 = np.genfromtxt(str(filename), skip_header=2, dtype=float)
-    os.chdir(cwd)
-    return vorticity_1
+                os.chdir(cwd)
+                return vorticity_1, dummy="v"
+            if filename[0] == 'p':
+                # x  y  z  vorticity_x  vorticity_y  vorticity_z ndarray
+                pressure_1 = np.genfromtxt(str(filename), skip_header=2, dtype=float)
+                os.chdir(cwd)
+                return pressure_1, dummy="p"
 
 
-def find_max(array):
+
+
+def find_max(array, xup, xlow, yup, ylow, zup, zlow, dummy):
     # x  y  z  vorticity_x  vorticity_y  vorticity_z ndarray
     # init values
-    v_xyz_max = array.item((0, 3))**2 + array.item((0, 4))**2 + array.item((0, 5))**2
+    if dummy = "v":
+        v_xyz_max = array.item((0, 3))**2 + array.item((0, 4))**2 + array.item((0, 5))**2
+    elif dummy = "p":
+        p_min = array.item((0 ,3))
     max_line = array.item(0)
-    for i in array:
-        v_xyz_new = i.item(3)**2 + i.item(4)**2 + i.item(5)**2
-        if v_xyz_new > v_xyz_max:
-            max_line = i
-            v_xyz_max = v_xyz_new
-            #print('current_vor:', v_xyz_new, 'max_vor', v_xyz_max)
-            #print('\n i\n', i, 'max_line \n', max_line)
 
-    v_xyz_max_real = math.sqrt(
-        max_line.item(3)**2 + max_line.item(4)**2 + max_line.item(5)**2
-    )
-    return v_xyz_max_real, max_line
+    # boundaries
+    x_bound = [xup, xlow]
+    x_bound.sort()  # now x_bound=[x_low,x_up]
+
+    y_bound = [yup, ylow]
+    y_bound.sort()
+
+    z_bound = [zup, zlow]
+    z_bound.sort()
+
+
+    for i in array:
+        if x_bound[0] < i.item(0) < x_bound[1]:
+            if y_bound[0] < i.item(1) < y_bound[1]:
+                if z_bound[0] < i.item(2) < z_bound[1]:
+
+                    v_xyz_new = i.item(3)**2 + i.item(4)**2 + i.item(5)**2
+                    if dummy = "v": # looking for vorticity max
+                        if v_xyz_new > v_xyz_max:
+                            max_line = i
+                            v_xyz_max = v_xyz_new
+                            #print('current_vor:', v_xyz_new, 'max_vor', v_xyz_max)
+                            #print('\n i\n', i, 'max_line \n', max_line)
+                    elif dummy = "p": # looking for min pressure
+                        p_min_new = i.item (3)
+                        if p_min > p_min_new:
+                            p_min = p_min_new
+                            max_line = i
+
+    if dummy = "v":
+        v_xyz_max_real = math.sqrt(
+            max_line.item(3)**2 + max_line.item(4)**2 + max_line.item(5)**2
+        )
+        return v_xyz_max_real, max_line, dummmy
+    if dummy = "p":
+        return p_min, maxline, dummy
 
 
 def avg_vorticity(array, max_line, radius ):
@@ -266,15 +308,26 @@ if __name__ == '__main__':
 
     cellcount = 20      # calculates with the cellsize to the radius, which is used to average around the maximum
 
+    # Grenzen in denen Nach Maxi/minima gesucht werden soll
+    xup =10000
+    xlow =-10000
+
+    yup = 10000
+    ylow = -10000
+
+    zup = 10000
+    zlow = -10000
+
     radius = cellcount * cellsize
 
-    array = Einlesen1(plotkind='wing')
-    max_vor, max_line = find_max(array)
-    max_vor, max_line = avg_vorticity(array, max_line, radius)
+    array,dummy = Einlesen1(plotkind='wing')
+
+    max_vor, max_line, dummy = find_max(array, xup, xlow, yup, ylow, zup, zlow, dummy) #Bestimmung des maxi/minimalen werts
+    max_vor, max_line = avg_vorticity(array, max_line, radius) #Mittelung
     #max_vor, max_line = var_avg_vorticity(array, max_line)
 
     # max_vor not needed
-
+    if dummy = "v": # wenn vorticity
     print('maximaler vorticity', max_vor, '\ncorresponding line:\n x \t | y\t| z\t| vorticity_X |v_y\t| v_z\n',\
           max_line.item(0), '\t',
           max_line.item(1), '\t',

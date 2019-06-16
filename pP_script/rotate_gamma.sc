@@ -15,8 +15,11 @@ rm -r postProcessing
 postProcess -func vorticity -latestTime |tee log.calculation_vorticity
 
 
-# sample vortex plane
-postProcess -func sampleDict_plane_vorticity -latestTime |tee log.vortex_plane
+# sample vortex plane !!!!! Druck oder Vorticity!!!!!!
+# postProcess -func sampleDict_plane_vorticity -latestTime |tee log.vortex_plane
+################### oder #####################
+postProcess -func sampleDict_plane_pressure -latestTime |tee log.vortex_plane
+
 
 #cd pP_script #  tools  need to be run from this folder
 
