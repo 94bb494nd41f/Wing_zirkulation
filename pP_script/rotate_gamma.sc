@@ -11,11 +11,13 @@ py2=rot_zirkulation.py
 
 cd .. #needs to be run from case
 rm -r postProcessing
+
 # calculate vorticity
 postProcess -func vorticity -latestTime |tee log.calculation_vorticity
 
+# !!!!! Druck oder Vorticity!!!!!!
 
-# sample vortex plane !!!!! Druck oder Vorticity!!!!!!
+# sample vortex plane
 # postProcess -func sampleDict_plane_vorticity -latestTime |tee log.vortex_plane
 ################### oder #####################
 postProcess -func sampleDict_plane_pressure -latestTime |tee log.vortex_plane
@@ -27,6 +29,7 @@ cp pP_script/$py1 postProcessing/
 cd postProcessing
 #find max and define lines
 python3 $py1 |tee log.linegeneration
+rm $py1
 
 cd ..
 #read out defined lines
@@ -37,3 +40,4 @@ cp pP_script/$py2 postProcessing/
 cd postProcessing
 #calculate circulation based on umlaufintegral
 python3 $py2 |tee log.calculation_gamma
+rm $py2

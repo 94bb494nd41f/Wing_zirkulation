@@ -359,7 +359,7 @@ if __name__ == '__main__':
     max_vor, max_line, dummy = find_max(array, xup, xlow, yup, ylow, zup, zlow, dummy) #Bestimmung des maxi/minimalen werts
     #check if Vectors are defined
     try:
-        a_1 and a_2 and a_3 and b_1 and b_2 and b_3 and c_1 and c_2 and c_3
+        a_1 and a_2 and a_3 and b_1 and b_2 and b_3
     except NameError:
         if dummy == 'p':
             print('\n Orientierung des Wirbels / Vektoren fuer Liniengeneration fehlen. Bei Druck aber unbedingt'
