@@ -19,13 +19,20 @@ def length_norm(x, y, z, length): # norming vector to a length
 def Einlesen1(plotkind):
     cwd = os.getcwd()
     print('\n das ist die cwd:\n ', cwd)
-    t1 = os.path.getctime(cwd + '/sampleDict_plane_vorticity')
-    t2 = os.path.getctime(cwd + '/sampleDict_plane_pressure')
-    if os.path.getctime(cwd + '/sampleDict_plane_vorticity') > os.path.getctime(cwd + '/sampleDict_plane_pressure'):
-        # determine the newest File/ Folder
-        os.chdir(cwd + '/sampleDict_plane_vorticity')
-    elif os.path.getctime(cwd + '/sampleDict_plane_vorticity') < os.path.getctime(cwd + '/sampleDict_plane_pressure'):
-        os.chdir(cwd + '/sampleDict_plane_pressure')
+    # t1 = os.path.getctime(cwd + '/sampleDict_plane_vorticity')
+    # t2 = os.path.getctime(cwd + '/sampleDict_plane_pressure')
+    if 'sampleDict_plane_vorticity' and 'sampleDict_plane_pressure' in os.listdir(cwd):
+        if os.path.getctime(cwd + '/sampleDict_plane_vorticity') > os.path.getctime(cwd + '/sampleDict_plane_pressure'):
+            # determine the newest File/ Folder
+            os.chdir(cwd + '/sampleDict_plane_vorticity')
+        elif os.path.getctime(cwd + '/sampleDict_plane_vorticity') < os.path.getctime(cwd + '/sampleDict_plane_pressure'):
+            os.chdir(cwd + '/sampleDict_plane_pressure')
+
+    elif 'sampleDict_plane_vorticity' and 'sampleDict_plane_pressure' not in os.listdir(cwd):
+        if 'sampleDict_plane_pressure' in os.listdir(cwd):
+            os.chdir(cwd + '/sampleDict_plane_pressure')
+        if 'sampleDict_plane_vorticity' in os.listdir(cwd):
+            os.chdir(cwd + '/sampleDict_plane_vorticity')
 
 
     list_timesteps = os.listdir(os.getcwd())
@@ -45,12 +52,14 @@ def Einlesen1(plotkind):
                 # x  y  z  vorticity_x  vorticity_y  vorticity_z ndarray
                 vorticity_1 = np.genfromtxt(str(filename), skip_header=2, dtype=float)
                 os.chdir(cwd)
-                return vorticity_1, dummy="v"
+                dummy = "v"
+                return vorticity_1, dummy
             if filename[0] == 'p':
                 # x  y  z  vorticity_x  vorticity_y  vorticity_z ndarray
                 pressure_1 = np.genfromtxt(str(filename), skip_header=2, dtype=float)
                 os.chdir(cwd)
-                return pressure_1, dummy="p"
+                dummy = "p"
+                return pressure_1, dummy
 
 
 
@@ -58,9 +67,9 @@ def Einlesen1(plotkind):
 def find_max(array, xup, xlow, yup, ylow, zup, zlow, dummy):
     # x  y  z  vorticity_x  vorticity_y  vorticity_z ndarray
     # init values
-    if dummy = "v":
+    if dummy == "v":
         v_xyz_max = array.item((0, 3))**2 + array.item((0, 4))**2 + array.item((0, 5))**2
-    elif dummy = "p":
+    elif dummy == "p":
         p_min = array.item((0 ,3))
     max_line = array.item(0)
 
@@ -80,26 +89,26 @@ def find_max(array, xup, xlow, yup, ylow, zup, zlow, dummy):
             if y_bound[0] < i.item(1) < y_bound[1]:
                 if z_bound[0] < i.item(2) < z_bound[1]:
 
-                    v_xyz_new = i.item(3)**2 + i.item(4)**2 + i.item(5)**2
-                    if dummy = "v": # looking for vorticity max
+                    if dummy == "v": # looking for vorticity max
+                        v_xyz_new = i.item(3) ** 2 + i.item(4) ** 2 + i.item(5) ** 2
                         if v_xyz_new > v_xyz_max:
                             max_line = i
                             v_xyz_max = v_xyz_new
                             #print('current_vor:', v_xyz_new, 'max_vor', v_xyz_max)
                             #print('\n i\n', i, 'max_line \n', max_line)
-                    elif dummy = "p": # looking for min pressure
+                    elif dummy == "p": # looking for min pressure
                         p_min_new = i.item (3)
                         if p_min > p_min_new:
                             p_min = p_min_new
                             max_line = i
 
-    if dummy = "v":
+    if dummy == "v":
         v_xyz_max_real = math.sqrt(
             max_line.item(3)**2 + max_line.item(4)**2 + max_line.item(5)**2
         )
-        return v_xyz_max_real, max_line, dummmy
-    if dummy = "p":
-        return p_min, maxline, dummy
+        return v_xyz_max_real, max_line, dummy
+    if dummy == "p":
+        return p_min, max_line, dummy
 
 
 def avg_vorticity(array, max_line, radius ):
@@ -319,16 +328,69 @@ if __name__ == '__main__':
     zlow = -10000
 
     radius = cellcount * cellsize
+    # Manuelle Definition des Zentrums
+    #x_c
+    #y_c
+    #z_c
 
+    #definition der Vektoren
+    #Richtung des Wirbels:
+    # c_1
+    # c_2
+    # c_3
+
+    #Vektor fuer Rechteck in Richtung 1
+    #a_1
+    #a_2
+    #a_3
+
+    # Vektor fuer Rechteck in Richtung 2
+    #b_1
+    #b_2
+    #b_3
+
+
+
+
+    ##########################################################################################################
+    # keine Parameter mehr
+    ##################################################################################################################
     array,dummy = Einlesen1(plotkind='wing')
-
     max_vor, max_line, dummy = find_max(array, xup, xlow, yup, ylow, zup, zlow, dummy) #Bestimmung des maxi/minimalen werts
-    max_vor, max_line = avg_vorticity(array, max_line, radius) #Mittelung
-    #max_vor, max_line = var_avg_vorticity(array, max_line)
+    #check if Vectors are defined
+    try:
+        a_1 and a_2 and a_3 and b_1 and b_2 and b_3 and c_1 and c_2 and c_3
+    except NameError:
+        if dummy == 'p':
+            print('\n Orientierung des Wirbels / Vektoren fuer Liniengeneration fehlen. Bei Druck aber unbedingt'
+                  ' notwendig. \n')
 
-    # max_vor not needed
-    if dummy = "v": # wenn vorticity
-    print('maximaler vorticity', max_vor, '\ncorresponding line:\n x \t | y\t| z\t| vorticity_X |v_y\t| v_z\n',\
+        definiert = False
+    else:
+        print('Variablen definiert')
+        definiert = False
+
+
+    # Wirbelkern, NICHT gemittelt
+    try:
+        x_c and y_c and z_c
+    except NameError:
+        x_core = max_line.item(0)
+        y_core = max_line.item(1)
+        z_core = max_line.item(2)
+    else:
+        print('!!!Achtung: Es werden der in \"Parameter\" definierte Kern genutzt ')
+        x_core = x_c
+        y_core = y_c
+        z_core = z_c
+
+    ###################################################################
+    #
+    # Handling wenn vorticity genutzt wird
+    ###################################################################
+    if dummy == "v": # wenn vorticity
+        max_vor, max_line = avg_vorticity(array, max_line, radius)  # Mittelung, nur sinnig wenn vorticity
+        print('maximaler vorticity', max_vor, '\ncorresponding line:\n x \t | y\t| z\t| vorticity_X |v_y\t| v_z\n',\
           max_line.item(0), '\t',
           max_line.item(1), '\t',
           max_line.item(2), '\t',
@@ -337,100 +399,105 @@ if __name__ == '__main__':
           max_line.item(5))
 
 
-    # max_vor -> max vorticity
-    # max line: x,y,z,v_x,v_y,v_z
-    x_core = max_line.item(0)
-    y_core = max_line.item(1)
-    z_core = max_line.item(2)
-    v_x = max_line.item(3)
-    v_y = max_line.item(4)
-    v_z = max_line.item(5)
-    print('point of max_vor:(x|y|z)', x_core, y_core, z_core)
+        # max_vor -> max vorticity
+        # max line: x,y,z,v_x,v_y,v_z
+        v_x = max_line.item(3)
+        v_y = max_line.item(4)
+        v_z = max_line.item(5)
+        print('point of max_vor:(x|y|z)', x_core, y_core, z_core)
 
-    # calc vector, alpha: x-axis and vector, beta: y-axis and vector, eta: z-axis and vecotr
-    max_vor = math.sqrt(
-        v_x**2 + v_y**2 + v_z**2
-    )
-    alpha_cos = v_x/max_vor
-    beta_cos = v_y/max_vor
-    eta_cos = v_z/max_vor
-    # defining plane which is described by the vector a and b. a, b, c are orthogonal to each other. c is the vector
-    # of the vortexcore
-    c_1 = alpha_cos
-    c_2 = beta_cos
-    c_3 = eta_cos
-    # confine system of equations
-    print('c1,c2,c3 normed to 1:\t ', c_1, c_2, c_3)
+        # calc vector, alpha: x-axis and vector, ceta: y-axis and vector, eta: z-axis and vecotr
+        max_vor = math.sqrt(
+            v_x**2 + v_y**2 + v_z**2
+        )
 
-    a_1 = c_1
-    a_2 = c_2
-    b_2 = c_2
+        if definiert == False:
+            alpha_cos = v_x/max_vor
+            beta_cos = v_y/max_vor
+            eta_cos = v_z/max_vor
+            # defining plane which is described by the vector a and b. a, b, c are orthogonal to each other. c is the vector
+            # of the vortexcore
+            c_1 = alpha_cos
+            c_2 = beta_cos
+            c_3 = eta_cos
+            # confine system of equations
+            print('c1,c2,c3 normed to 1:\t ', c_1, c_2, c_3)
 
-     # calculate missing parts of vectors
-    a_3 = -(c_1**2 + c_2**2)/c_3
-    b_1 = -(c_2**2)/c_1
+            a_1 = c_1
+            a_2 = c_2
+            b_2 = c_2
 
-    b_3 = (c_2**2 - c_2 * b_2) / (c_3 - a_3) # = 0, not needed
+             # calculate missing parts of vectors
+            a_3 = -(c_1**2 + c_2**2)/c_3
+            b_1 = -(c_2**2)/c_1
+
+            b_3 = (c_2**2 - c_2 * b_2) / (c_3 - a_3) # = 0, not needed
 
 
-    # norm vectors so a defined length
-    real_length = 0.4
-    length = real_length / 2
-    a_1, a_2, a_3 = length_norm(a_1, a_2, a_3, length)
-    b_1, b_2, b_3 = length_norm(b_1, b_2, b_3, length)
-    c_1, c_2, c_3 = length_norm(c_1, c_2, c_3, length)
-    print('\n c_i colinear to vortex, a,c,b are orthogonal to eachother and normed to a length of', length)
-    print('c1,c2,c3: \t', c_1, c_2, c_3)
-    print('a1,a2,a3: \t', a_1, a_2, a_3)
-    print('b1,b2,b3: \t', b_1, b_2, b_3)
+            # norm vectors so a defined length
+            real_length = 0.4
+            length = real_length / 2
+            a_1, a_2, a_3 = length_norm(a_1, a_2, a_3, length)
+            b_1, b_2, b_3 = length_norm(b_1, b_2, b_3, length)
+            c_1, c_2, c_3 = length_norm(c_1, c_2, c_3, length)
+            print('\n c_i colinear to vortex, a,c,b are orthogonal to eachother and normed to a length of', length)
+            print('c1,c2,c3: \t', c_1, c_2, c_3)
+            print('a1,a2,a3: \t', a_1, a_2, a_3)
+            print('b1,b2,b3: \t', b_1, b_2, b_3)
+        else:
+            print('!!!Achtung: Es werden die in \"Parameter\" definierten Vektoren genutzt ')
+    ##########################################################################
+    # # generate points
+    #######################################################################
 
-    punkte = []
-    # generate points
-    # 1
-    x_s = x_core + a_1 - b_1
-    y_s = y_core + a_2 - b_2
-    z_s = z_core + a_3 - b_3
+    if definiert == False:
+        print('\n Orientierung des Wirbels / Vektoren fuer Liniengeneration fehlen. Bei Druck aber unbedingt' \
+              ' notwendig. \n')
+    else:
+        punkte = []
+        # 1 start
+        x_s = x_core + a_1 - b_1
+        y_s = y_core + a_2 - b_2
+        z_s = z_core + a_3 - b_3
+        # ende
+        x_e = x_core + a_1 + b_1
+        y_e = y_core + a_2 + b_2
+        z_e = z_core + a_3 + b_3
 
-    x_e = x_core + a_1 + b_1
-    y_e = y_core + a_2 + b_2
-    z_e = z_core + a_3 + b_3
+        punkte.append((x_s, y_s,z_s, x_e, y_e, z_e, 1)) # 1 ist line ID
 
-    punkte.append((x_s, y_s,z_s, x_e, y_e, z_e, 1))
+        # 2
+        x_s = x_core + a_1 + b_1
+        y_s = y_core + a_2 + b_2
+        z_s = z_core + a_3 + b_3
 
-    # 2
-    x_s = x_core + a_1 + b_1
-    y_s = y_core + a_2 + b_2
-    z_s = z_core + a_3 + b_3
+        x_e = x_core - a_1 + b_1
+        y_e = y_core - a_2 + b_2
+        z_e = z_core - a_3 + b_3
 
-    x_e = x_core - a_1 + b_1
-    y_e = y_core - a_2 + b_2
-    z_e = z_core - a_3 + b_3
+        punkte.append((x_s, y_s, z_s, x_e, y_e, z_e, 2))
 
-    punkte.append((x_s, y_s, z_s, x_e, y_e, z_e, 2))
+        # 3
+        x_s = x_core - a_1 + b_1
+        y_s = y_core - a_2 + b_2
+        z_s = z_core - a_3 + b_3
 
-    # 3
-    x_s = x_core - a_1 + b_1
-    y_s = y_core - a_2 + b_2
-    z_s = z_core - a_3 + b_3
+        x_e = x_core - a_1 - b_1
+        y_e = y_core - a_2 - b_2
+        z_e = z_core - a_3 - b_3
 
-    x_e = x_core - a_1 - b_1
-    y_e = y_core - a_2 - b_2
-    z_e = z_core - a_3 - b_3
+        punkte.append((x_s, y_s, z_s, x_e, y_e, z_e, 3))
 
-    punkte.append((x_s, y_s, z_s, x_e, y_e, z_e, 3))
+        # 4
+        x_s = x_core - a_1 - b_1
+        y_s = y_core - a_2 - b_2
+        z_s = z_core - a_3 - b_3
 
-    # 4
-    x_s = x_core - a_1 - b_1
-    y_s = y_core - a_2 - b_2
-    z_s = z_core - a_3 - b_3
+        x_e = x_core + a_1 - b_1
+        y_e = y_core + a_2 - b_2
+        z_e = z_core + a_3 - b_3
 
-    x_e = x_core + a_1 - b_1
-    y_e = y_core + a_2 - b_2
-    z_e = z_core + a_3 - b_3
+        punkte.append((x_s, y_s, z_s, x_e, y_e, z_e, 4))
 
-    punkte.append((x_s, y_s, z_s, x_e, y_e, z_e, 4))
-
-    sampledict(punkte)
-
+        sampledict(punkte) # schreibt die Punkte ins Sampledict
     print('\n \n -------------------------end---------------------------------------')
-
