@@ -225,7 +225,6 @@ def sampledict (punkte):
 
 if __name__ == '__main__':
     # Parameter
-    real_length = 0.4  #absolute groeße des Fensters, ist quadratisch
     ######################################################
     #   _________________
     #   |                |
@@ -238,6 +237,7 @@ if __name__ == '__main__':
     #
     #
     ##############################################################
+    real_length = 0.4  # absolute groeße des Fensters, ist quadratisch
 
     cellsize = 0.0082  # cellsize in core vortex
 
@@ -264,16 +264,16 @@ if __name__ == '__main__':
     c_1=3
     c_2=4
     c_3=5
-
-    #Vektor fuer Rechteck in Richtung 1
-    #a_1
-    #a_2
-    #a_3
-
-    # Vektor fuer Rechteck in Richtung 2
-    #b_1
-    #b_2
-    #b_3
+    #
+    # #Vektor fuer Rechteck in Richtung 1
+    # a_1=9
+    # a_2=9
+    # a_3=9
+    #
+    # # Vektor fuer Rechteck in Richtung 2
+    # b_1=9
+    # b_2=9
+    # b_3=9
 
 
 
@@ -289,17 +289,53 @@ if __name__ == '__main__':
     if dummy == "n":
         print('Verfahren im manuellen Modus')
         try:
-            a_1 and a_2 and a_3 and b_1 and b_2 and b_3 and x_c and y_c and z_c
+            a_1 and a_2 and a_3 and b_1 and b_2 and b_3
         except NameError:
-            print('\n Orientierung des Wirbels / Vektoren fuer Liniengeneration (\" Rechteckvektoren\") oder Wirbelkern'
-                  'fehlen. Unbedingt notwendig. \n')
+            print('\n Vektoren fuer Liniengeneration (\" Rechteckvektoren\") fehlen\n')
+            try:
+                c_1 and c_2 and c_3
+            except NameError:
+                print('\n Wirbelachse definieren, Rechteckvektoren koennen nicht berechnet werden\n')
+                definiert = False
+            else:
+                print('\n Rechteckvektoren werden basierend auf wirbelachse berechnet \n')
+                a_1 = c_1
+                a_2 = c_2
+                b_2 = c_2
+
+                # calculate missing parts of vectors
+                a_3 = -(c_1 ** 2 + c_2 ** 2) / c_3
+                b_1 = -(c_2 ** 2) / c_1
+
+                b_3 = (c_2 ** 2 - c_2 * b_2) / (c_3 - a_3)  # = 0, not needed
+
+                # norm vectors so a defined length
+                real_length = 0.4
+                length = real_length / 2
+                a_1, a_2, a_3 = length_norm(a_1, a_2, a_3, length)
+                b_1, b_2, b_3 = length_norm(b_1, b_2, b_3, length)
+                c_1, c_2, c_3 = length_norm(c_1, c_2, c_3, length)
+                print('\n c_i colinear to vortex, a,c,b are orthogonal to eachother and normed to a length of', length)
+                print('c1,c2,c3: \t', c_1, c_2, c_3)
+                print('a1,a2,a3: \t', a_1, a_2, a_3)
+                print('b1,b2,b3: \t', b_1, b_2, b_3)
+
+                definiert = True
+
+        else:
+            print('\n Vektoren definiert\n ')
+            definiert = True
+        try:
+            x_c and y_c and z_c
+        except NameError:
+            print('\n wirbelzentrum nicht definiert')
             definiert = False
         else:
-            print('Variablen definiert')
-            x_core = x_c
-            y_core = y_c
-            z_core = z_c
-            definiert = True
+            if definiert == True:
+                x_core = x_c
+                y_core = y_c
+                z_core = z_c
+
 
     #############################################################################################################
     #               Druck
