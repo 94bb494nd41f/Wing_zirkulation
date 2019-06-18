@@ -3,10 +3,16 @@ für die Auswertung muss im Case ein *p*ost *P*rocessing Ordner *pP_script* erst
 pP_script/direction_of_vortex.py
 pP_script/rot_zirkulation.py
 pP_script/rotate_gamma.sc
+# To Do
+Beim Druck nur eine Wirbelachse vorgeben?
 
 Die Tools müssen aus dem pP_script Ordner mit *./* gestartet werden. Unter Umständen muss vorher noch chmod +x angewandt werden
 ## was kann das Tool?
-Bestimmung der Zirkulation auf Basis eines Druckminimums oder der Voritcity. NOCH NICHT VOLLSTÄNDIG
+Bestimmung der Zirkulation auf Basis eines Druckminimums. Der Bereich, in dem der Wirbel gesucht werden soll kann durch Gebietsdefinition eingeschränkt werden. Es ist daher auch möglich in Ebenen zu suchen, die die Grenzschicht schneiden. Bei dieser Variante muss eine Wirbelachse sowie die Vektoren, die das Rechteck aufspannen definiert werden.
+
+Bestimmung der Zirkulation auf Basis eines Vorticitymaximums. Der Bereich, in dem der Wirbel gesucht werden soll kann durch Gebietsdefinition eingeschränkt werden. Es ist daher auch möglich in Ebenen zu suchen, die die Grenzschicht schneiden. Die Wirbelachse, sowie die zum Aufspannen des Rechtecks benötigten Vektoren, werden berechnet. Die Orientierunt der Seiten des Rechtecks im Raum ist dabei Beliebig. Das Gleichungssystem zur bestimmtung der "Rechteck-Vektoren" hat drei Freiheitsgrade, die willkürlich beschränkt wurden. Forderung der Art "Rechteckseite A parallel zu Y-Achse" können daher implementiert werden.
+
+Bestimmung der Zirkulation auf Basis von definierten Vektoren, Wirbelzentrum und Fenstergröße.
 
 ## Zirkulationsauswertung bei beliebiger Wirbelorientierung
 ### Files:direction_of_vortex.py
