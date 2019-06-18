@@ -21,19 +21,19 @@ def Einlesen1(plotkind):
     print('\n das ist die cwd:\n ', cwd, '\n')
     # t1 = os.path.getctime(cwd + '/sampleDict_plane_vorticity')
     # t2 = os.path.getctime(cwd + '/sampleDict_plane_pressure')
-    if 'sampleDict_plane_vorticity' and 'sampleDict_plane_pressure' in os.listdir(cwd):
+    if 'sampleDict_plane_vorticity' in os.listdir(cwd) and 'sampleDict_plane_pressure' in os.listdir(cwd):
         if os.path.getctime(cwd + '/sampleDict_plane_vorticity') > os.path.getctime(cwd + '/sampleDict_plane_pressure'):
             # determine the newest File/ Folder
             os.chdir(cwd + '/sampleDict_plane_vorticity')
         elif os.path.getctime(cwd + '/sampleDict_plane_vorticity') < os.path.getctime(cwd + '/sampleDict_plane_pressure'):
             os.chdir(cwd + '/sampleDict_plane_pressure')
 
-    elif 'sampleDict_plane_vorticity' and 'sampleDict_plane_pressure' not in os.listdir(cwd):
+    elif 'sampleDict_plane_vorticity' not in os.listdir(cwd) or 'sampleDict_plane_pressure' not in os.listdir(cwd):
         if 'sampleDict_plane_pressure' in os.listdir(cwd):
             os.chdir(cwd + '/sampleDict_plane_pressure')
         if 'sampleDict_plane_vorticity' in os.listdir(cwd):
             os.chdir(cwd + '/sampleDict_plane_vorticity')
-        if 'sampleDict_plane_vorticity' not in os.listdir(cwd) or 'sampleDict_plane_pressure' not in os.listdir(cwd):
+        if 'sampleDict_plane_vorticity' not in os.listdir(cwd) and 'sampleDict_plane_pressure' not in os.listdir(cwd):
             dummy = 'n'
             array = None
             return array, dummy
@@ -261,9 +261,9 @@ if __name__ == '__main__':
 
     #definition der Vektoren
     #Richtung des Wirbels:
-    # c_1
-    # c_2
-    # c_3
+    c_1=3
+    c_2=4
+    c_3=5
 
     #Vektor fuer Rechteck in Richtung 1
     #a_1
@@ -305,11 +305,47 @@ if __name__ == '__main__':
     #               Druck
     if dummy == "p":
         print('Verfahren im Druck Modus')
+        max_vor, max_line, dummy = find_max(array, xup, xlow, yup, ylow, zup, zlow,
+                                            dummy)  # Bestimmung des maxi/minimalen werts
         try:
             a_1 and a_2 and a_3 and b_1 and b_2 and b_3
         except NameError:
-            print('\n Vektoren fuer Liniengeneration (\" Rechteckvektoren\") fehlen. Unbedingt notwendig. \n')
-            definiert = False
+            print('\n Vektoren fuer Liniengeneration (\" Rechteckvektoren\") fehlen\n')
+            try:
+                c_1 and c_2 and c_3
+            except NameError:
+                print('\n Wirbelachse definieren, Rechteckvektoren werden auf dieser Basis berchnet\n')
+                definiert = False
+            else:
+                print('\n Rechteckvektoren werden basierend auf wirbelachse berechnet \n')
+                a_1 = c_1
+                a_2 = c_2
+                b_2 = c_2
+
+                # calculate missing parts of vectors
+                a_3 = -(c_1 ** 2 + c_2 ** 2) / c_3
+                b_1 = -(c_2 ** 2) / c_1
+
+                b_3 = (c_2 ** 2 - c_2 * b_2) / (c_3 - a_3)  # = 0, not needed
+
+                # norm vectors so a defined length
+                real_length = 0.4
+                length = real_length / 2
+                a_1, a_2, a_3 = length_norm(a_1, a_2, a_3, length)
+                b_1, b_2, b_3 = length_norm(b_1, b_2, b_3, length)
+                c_1, c_2, c_3 = length_norm(c_1, c_2, c_3, length)
+                print('\n c_i colinear to vortex, a,c,b are orthogonal to eachother and normed to a length of', length)
+                print('c1,c2,c3: \t', c_1, c_2, c_3)
+                print('a1,a2,a3: \t', a_1, a_2, a_3)
+                print('b1,b2,b3: \t', b_1, b_2, b_3)
+
+                x_core = max_line.item(0)
+                y_core = max_line.item(1)
+                z_core = max_line.item(2)
+
+                definiert = True
+
+
         else:
             print('Variablen definiert')
             max_vor, max_line, dummy = find_max(array, xup, xlow, yup, ylow, zup, zlow,
@@ -397,6 +433,7 @@ if __name__ == '__main__':
             print('c1,c2,c3: \t', c_1, c_2, c_3)
             print('a1,a2,a3: \t', a_1, a_2, a_3)
             print('b1,b2,b3: \t', b_1, b_2, b_3)
+            definiert = True
         elif definiert == True:
             print('!!!Achtung: Es werden die in \"Parameter\" definierten Vektoren genutzt ')
 
@@ -409,7 +446,7 @@ if __name__ == '__main__':
         print('\n Die Benoetigten Parameter fehlen. Bitte direction_of_vortex entsprechende bearbeiten. \n')
 
     elif definiert == True:
-        print('\n direction_of_vortex Fehlerfrei durchgelaufen \n')
+        print('\n Alle Variablen vorhanden, berechne Punkte \n')
         punkte = []
         # 1 start
         x_s = x_core + a_1 - b_1
@@ -455,5 +492,5 @@ if __name__ == '__main__':
 
         punkte.append((x_s, y_s, z_s, x_e, y_e, z_e, 4))
 
-        sampledict(punkte) # schreibt die Punkte ins Sampledict
+        sampledict(punkte)  # schreibt die Punkte ins Sampledict
     print('\n \n -------------------------end---------------------------------------')
