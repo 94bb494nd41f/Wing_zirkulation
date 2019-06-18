@@ -18,7 +18,7 @@ def length_norm(x, y, z, length): # norming vector to a length
 
 def Einlesen1(plotkind):
     cwd = os.getcwd()
-    print('\n das ist die cwd:\n ', cwd)
+    print('\n das ist die cwd:\n ', cwd, '\n')
     # t1 = os.path.getctime(cwd + '/sampleDict_plane_vorticity')
     # t2 = os.path.getctime(cwd + '/sampleDict_plane_pressure')
     if 'sampleDict_plane_vorticity' and 'sampleDict_plane_pressure' in os.listdir(cwd):
@@ -33,7 +33,10 @@ def Einlesen1(plotkind):
             os.chdir(cwd + '/sampleDict_plane_pressure')
         if 'sampleDict_plane_vorticity' in os.listdir(cwd):
             os.chdir(cwd + '/sampleDict_plane_vorticity')
-
+        if 'sampleDict_plane_vorticity' not in os.listdir(cwd) or 'sampleDict_plane_pressure' not in os.listdir(cwd):
+            dummy = 'n'
+            array = None
+            return array, dummy
 
     list_timesteps = os.listdir(os.getcwd())
     print('Timesteps', list_timesteps)
@@ -62,15 +65,13 @@ def Einlesen1(plotkind):
                 return pressure_1, dummy
 
 
-
-
 def find_max(array, xup, xlow, yup, ylow, zup, zlow, dummy):
     # x  y  z  vorticity_x  vorticity_y  vorticity_z ndarray
     # init values
     if dummy == "v":
         v_xyz_max = array.item((0, 3))**2 + array.item((0, 4))**2 + array.item((0, 5))**2
     elif dummy == "p":
-        p_min = array.item((0 ,3))
+        p_min = array.item((0, 3))
     max_line = array.item(0)
 
     # boundaries
@@ -82,7 +83,6 @@ def find_max(array, xup, xlow, yup, ylow, zup, zlow, dummy):
 
     z_bound = [zup, zlow]
     z_bound.sort()
-
 
     for i in array:
         if x_bound[0] < i.item(0) < x_bound[1]:
@@ -163,80 +163,6 @@ def avg_vorticity(array, max_line, radius ):
     n_line = np.asanyarray(n_line)
     return avg_vort, n_line
 
-
-def var_avg_vorticity(array, max_line):
-    # Nur fuer invarianze zu winkel wichtig
-    bandbreite = 0.35       # diameter or sphere projected onto the plane over which the average is taken
-    n = 0
-    obergrenze = 0.7
-    untergrenze = 0.1
-    intervalls = 100
-    stepwidth = (obergrenze-untergrenze)/intervalls
-    for bandbreite in np.arange(untergrenze, obergrenze, stepwidth): # numpy.arange to execute range function with\
-        # floats
-
-        avg_list = []
-        avg_x = 0
-        avg_y = 0
-        avg_z = 0
-        sig_x = np.sign(max_line.item(0))
-        sig_y = np.sign(max_line.item(1))
-        sig_z = np.sign(max_line.item(2))
-
-        # determine boundaries corresponding to the signum of the max_line coordinate
-        if sig_x == -1:
-            x_up = max_line.item(0) * (1 - bandbreite)
-            x_low = max_line.item(0) * (1 + bandbreite)
-        if sig_x == 1:
-            x_up = max_line.item(0) * (1 + bandbreite)
-            x_low = max_line.item(0) * (1 - bandbreite)
-
-        if sig_y == -1:
-            y_up = max_line.item(1) * (1 - bandbreite)
-            y_low = max_line.item(1) * (1 + bandbreite)
-        if sig_y == 1:
-            y_up = max_line.item(1) * (1 + bandbreite)
-            y_low = max_line.item(1) * (1 - bandbreite)
-
-        if sig_z == -1:
-            z_up = max_line.item(2) * (1-bandbreite)
-            z_low = max_line.item(2) * (1+bandbreite)
-        if sig_z == 1:
-            z_up = max_line.item(2) * (1+bandbreite)
-            z_low = max_line.item(2) * (1-bandbreite)
-
-        for i in array:
-            if x_low < i.item(0) < x_up:
-                if y_low < i.item(1) < y_up:
-                    if z_low < i.item(2) < z_up:
-                        n += 1
-
-                        avg_list.append((i.item(3), i.item(4), i.item(5)))
-
-        frac = 1/(len(avg_list)-1)
-        avg_list = np.asanyarray(avg_list)
-
-        for i in avg_list:      #sum for average
-            avg_x += i.item(0)
-            avg_y += i.item(1)
-            avg_z += i.item(2)
-        # multiply with 1/n
-        avg_x = frac * avg_x
-        avg_y = frac * avg_y
-        avg_z = frac * avg_z
-
-        avg_vort = math.sqrt(
-            (avg_x)**2 +
-            (avg_y)**2 +
-            (avg_z)**2
-        )
-        c_1 =avg_x / avg_vort
-        c_2 =avg_y / avg_vort
-        c_3 =avg_z / avg_vort
-        print('c:,', c_1, ',', c_2, ',', c_3)
-        n_line = (max_line.item(0), max_line.item(1), max_line.item(2), avg_x, avg_y, avg_z)
-        n_line = np.asanyarray(n_line)
-    return avg_vort, n_line
 
 
 def sampledict (punkte):
@@ -355,52 +281,80 @@ if __name__ == '__main__':
     ##########################################################################################################
     # keine Parameter mehr
     ##################################################################################################################
-    array,dummy = Einlesen1(plotkind='wing')
-    max_vor, max_line, dummy = find_max(array, xup, xlow, yup, ylow, zup, zlow, dummy) #Bestimmung des maxi/minimalen werts
-    #check if Vectors are defined
-    try:
-        a_1 and a_2 and a_3 and b_1 and b_2 and b_3
-    except NameError:
-        if dummy == 'p':
-            print('\n Orientierung des Wirbels / Vektoren fuer Liniengeneration fehlen. Bei Druck aber unbedingt'
-                  ' notwendig. \n')
 
-        definiert = False
-    else:
-        print('Variablen definiert')
-        definiert = False
+    array, dummy = Einlesen1(plotkind='wing') # liest die Druck oder Voritcity datei ein
+
+    #######################################################################
+    #           Manuell Definiert
+    if dummy == "n":
+        print('Verfahren im manuellen Modus')
+        try:
+            a_1 and a_2 and a_3 and b_1 and b_2 and b_3 and x_c and y_c and z_c
+        except NameError:
+            print('\n Orientierung des Wirbels / Vektoren fuer Liniengeneration (\" Rechteckvektoren\") oder Wirbelkern'
+                  'fehlen. Unbedingt notwendig. \n')
+            definiert = False
+        else:
+            print('Variablen definiert')
+            x_core = x_c
+            y_core = y_c
+            z_core = z_c
+            definiert = True
+
+    #############################################################################################################
+    #               Druck
+    if dummy == "p":
+        print('Verfahren im Druck Modus')
+        try:
+            a_1 and a_2 and a_3 and b_1 and b_2 and b_3
+        except NameError:
+            print('\n Vektoren fuer Liniengeneration (\" Rechteckvektoren\") fehlen. Unbedingt notwendig. \n')
+            definiert = False
+        else:
+            print('Variablen definiert')
+            max_vor, max_line, dummy = find_max(array, xup, xlow, yup, ylow, zup, zlow,
+                                                dummy)  # Bestimmung des maxi/minimalen werts
+            x_core = max_line.item(0)
+            y_core = max_line.item(1)
+            z_core = max_line.item(2)
+
+            # check if Vectors are defined
+            definiert = True
+    ############################################################################################################
+    #          Vorticity
+    if dummy == "v":  # wenn vorticity
+        print('Verfahren im Vorticity Modus')
+
+        max_vor, max_line, dummy = find_max(array, xup, xlow, yup, ylow, zup, zlow,
+                                            dummy)  # Bestimmung des maxi/minimalen werts
+        max_vor, max_line = avg_vorticity(array, max_line, radius)  # Mittelung
 
 
-    # Wirbelkern, NICHT gemittelt
-    try:
-        x_c and y_c and z_c
-    except NameError:
-        x_core = max_line.item(0)
-        y_core = max_line.item(1)
-        z_core = max_line.item(2)
-    else:
-        print('!!!Achtung: Es werden der in \"Parameter\" definierte Kern genutzt ')
-        x_core = x_c
-        y_core = y_c
-        z_core = z_c
+        # checken ob Vektoren definiert sind
+        try:
+            a_1 and a_2 and a_3 and b_1 and b_2 and b_3
+        except NameError:
+            print('\n Vektoren werden Berechnet. \n')
+            definiert = False
+        else:
+            # print('Variablen definiert')
+            definiert = True
 
-    ###################################################################
-    #
-    # Handling wenn vorticity genutzt wird
-    ###################################################################
-    if dummy == "v": # wenn vorticity
-        max_vor, max_line = avg_vorticity(array, max_line, radius)  # Mittelung, nur sinnig wenn vorticity
-        print('maximaler vorticity', max_vor, '\ncorresponding line:\n x \t | y\t| z\t| vorticity_X |v_y\t| v_z\n',\
-          max_line.item(0), '\t',
-          max_line.item(1), '\t',
-          max_line.item(2), '\t',
-          max_line.item(3), '\t',
-          max_line.item(4), '\t',
-          max_line.item(5))
 
+        print('maximaler vorticity', max_vor, '\ncorresponding line:\n x \t | y\t| z\t| vorticity_X |v_y\t| v_z\n', \
+              max_line.item(0), '\t',
+              max_line.item(1), '\t',
+              max_line.item(2), '\t',
+              max_line.item(3), '\t',
+              max_line.item(4), '\t',
+              max_line.item(5))
 
         # max_vor -> max vorticity
         # max line: x,y,z,v_x,v_y,v_z
+        x_core = max_line.item(0)
+        y_core = max_line.item(1)
+        z_core = max_line.item(2)
+
         v_x = max_line.item(3)
         v_y = max_line.item(4)
         v_z = max_line.item(5)
@@ -408,13 +362,13 @@ if __name__ == '__main__':
 
         # calc vector, alpha: x-axis and vector, ceta: y-axis and vector, eta: z-axis and vecotr
         max_vor = math.sqrt(
-            v_x**2 + v_y**2 + v_z**2
+            v_x ** 2 + v_y ** 2 + v_z ** 2
         )
 
         if definiert == False:
-            alpha_cos = v_x/max_vor
-            beta_cos = v_y/max_vor
-            eta_cos = v_z/max_vor
+            alpha_cos = v_x / max_vor
+            beta_cos = v_y / max_vor
+            eta_cos = v_z / max_vor
             # defining plane which is described by the vector a and b. a, b, c are orthogonal to each other. c is the vector
             # of the vortexcore
             c_1 = alpha_cos
@@ -427,12 +381,11 @@ if __name__ == '__main__':
             a_2 = c_2
             b_2 = c_2
 
-             # calculate missing parts of vectors
-            a_3 = -(c_1**2 + c_2**2)/c_3
-            b_1 = -(c_2**2)/c_1
+            # calculate missing parts of vectors
+            a_3 = -(c_1 ** 2 + c_2 ** 2) / c_3
+            b_1 = -(c_2 ** 2) / c_1
 
-            b_3 = (c_2**2 - c_2 * b_2) / (c_3 - a_3) # = 0, not needed
-
+            b_3 = (c_2 ** 2 - c_2 * b_2) / (c_3 - a_3)  # = 0, not needed
 
             # norm vectors so a defined length
             real_length = 0.4
@@ -444,16 +397,19 @@ if __name__ == '__main__':
             print('c1,c2,c3: \t', c_1, c_2, c_3)
             print('a1,a2,a3: \t', a_1, a_2, a_3)
             print('b1,b2,b3: \t', b_1, b_2, b_3)
-        else:
+        elif definiert == True:
             print('!!!Achtung: Es werden die in \"Parameter\" definierten Vektoren genutzt ')
+
+
     ##########################################################################
     # # generate points
     #######################################################################
 
     if definiert == False:
-        print('\n Orientierung des Wirbels / Vektoren fuer Liniengeneration fehlen. Bei Druck aber unbedingt' \
-              ' notwendig. \n')
-    else:
+        print('\n Die Benoetigten Parameter fehlen. Bitte direction_of_vortex entsprechende bearbeiten. \n')
+
+    elif definiert == True:
+        print('\n direction_of_vortex Fehlerfrei durchgelaufen \n')
         punkte = []
         # 1 start
         x_s = x_core + a_1 - b_1
