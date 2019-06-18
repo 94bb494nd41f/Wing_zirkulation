@@ -5,13 +5,15 @@ pP_script/rot_zirkulation.py
 pP_script/rotate_gamma.sc
 
 Die Tools müssen aus dem pP_script Ordner mit *./* gestartet werden. Unter Umständen muss vorher noch chmod +x angewandt werden
-
+## was kann das Tool?
+Bestimmung der Zirkulation auf Basis eines Druckminimums oder der Voritcity. NOCH NICHT VOLLSTÄNDIG
 
 ## Zirkulationsauswertung bei beliebiger Wirbelorientierung
 ### Files:direction_of_vortex.py
 ### Files:rot_zirkulation.py
 ### Files:rotate_gamma.sc
-
+####################################################################################################################
+### rotate_gamma.sc
 Anwendung: zunächst muss die Datei *sampleDict_plane_vorticity_file* in /system kopiert und in *sampleDict_plane_vorticity* umbenannt werden. In der Datei selber muss nun eine den Wirbelkern schneidende Ebene definiert (normalVector und basePoint) werden.
 Für das Tool ist es essentiell, dass die maximale Vorticity im Wirbelkern zu finden ist, ein schneiden von Grenzschichten sollte daher unbedingt vermieden werden. 
 
