@@ -223,6 +223,32 @@ def sampledict (punkte):
     return()
 
 
+def berechnung_Rechteckvektor(c_1, c_2, c_3):
+    #gewaehlte RB
+    a_1 = c_1
+    a_2 = c_2
+    b_2 = c_2
+
+    # calculate missing parts of vectors
+    a_3 = -(c_1 ** 2 + c_2 ** 2) / c_3
+    b_1 = -(c_2 ** 2) / c_1
+
+    b_3 = (c_2 ** 2 - c_2 * b_2) / (c_3 - a_3)  # = 0, not needed
+
+    # norm vectors so a defined length
+    real_length = 0.4
+    length = real_length / 2
+    a_1, a_2, a_3 = length_norm(a_1, a_2, a_3, length)
+    b_1, b_2, b_3 = length_norm(b_1, b_2, b_3, length)
+    c_1, c_2, c_3 = length_norm(c_1, c_2, c_3, length)
+    print('\n c_i colinear to vortex, a,c,b are orthogonal to eachother and normed to a length of', length)
+    print('c1,c2,c3: \t', c_1, c_2, c_3)
+    print('a1,a2,a3: \t', a_1, a_2, a_3)
+    print('b1,b2,b3: \t', b_1, b_2, b_3)
+
+    return a_1, a_2, a_3, b_1, b_2, b_3
+
+
 if __name__ == '__main__':
     # Parameter
     ######################################################
@@ -299,26 +325,8 @@ if __name__ == '__main__':
                 definiert = False
             else:
                 print('\n Rechteckvektoren werden basierend auf wirbelachse berechnet \n')
-                a_1 = c_1
-                a_2 = c_2
-                b_2 = c_2
 
-                # calculate missing parts of vectors
-                a_3 = -(c_1 ** 2 + c_2 ** 2) / c_3
-                b_1 = -(c_2 ** 2) / c_1
-
-                b_3 = (c_2 ** 2 - c_2 * b_2) / (c_3 - a_3)  # = 0, not needed
-
-                # norm vectors so a defined length
-                real_length = 0.4
-                length = real_length / 2
-                a_1, a_2, a_3 = length_norm(a_1, a_2, a_3, length)
-                b_1, b_2, b_3 = length_norm(b_1, b_2, b_3, length)
-                c_1, c_2, c_3 = length_norm(c_1, c_2, c_3, length)
-                print('\n c_i colinear to vortex, a,c,b are orthogonal to eachother and normed to a length of', length)
-                print('c1,c2,c3: \t', c_1, c_2, c_3)
-                print('a1,a2,a3: \t', a_1, a_2, a_3)
-                print('b1,b2,b3: \t', b_1, b_2, b_3)
+                a_1, a_2, a_3, b_1, b_2, b_3 = berechnung_Rechteckvektor(c_1, c_2, c_3)
 
                 definiert = True
 
@@ -354,30 +362,7 @@ if __name__ == '__main__':
                 definiert = False
             else:
                 print('\n Rechteckvektoren werden basierend auf wirbelachse berechnet \n')
-                a_1 = c_1
-                a_2 = c_2
-                b_2 = c_2
-
-                # calculate missing parts of vectors
-                a_3 = -(c_1 ** 2 + c_2 ** 2) / c_3
-                b_1 = -(c_2 ** 2) / c_1
-
-                b_3 = (c_2 ** 2 - c_2 * b_2) / (c_3 - a_3)  # = 0, not needed
-
-                # norm vectors so a defined length
-                real_length = 0.4
-                length = real_length / 2
-                a_1, a_2, a_3 = length_norm(a_1, a_2, a_3, length)
-                b_1, b_2, b_3 = length_norm(b_1, b_2, b_3, length)
-                c_1, c_2, c_3 = length_norm(c_1, c_2, c_3, length)
-                print('\n c_i colinear to vortex, a,c,b are orthogonal to eachother and normed to a length of', length)
-                print('c1,c2,c3: \t', c_1, c_2, c_3)
-                print('a1,a2,a3: \t', a_1, a_2, a_3)
-                print('b1,b2,b3: \t', b_1, b_2, b_3)
-
-                x_core = max_line.item(0)
-                y_core = max_line.item(1)
-                z_core = max_line.item(2)
+                a_1, a_2, a_3, b_1, b_2, b_3 = berechnung_Rechteckvektor(c_1, c_2, c_3)
 
                 definiert = True
 
@@ -389,6 +374,7 @@ if __name__ == '__main__':
             x_core = max_line.item(0)
             y_core = max_line.item(1)
             z_core = max_line.item(2)
+            p_min = max_line.item(3) #fuer Berechnung des Viskosen durchmessers
 
             # check if Vectors are defined
             definiert = True
@@ -479,7 +465,7 @@ if __name__ == '__main__':
     #######################################################################
 
     if definiert == False:
-        print('\n Die Benoetigten Parameter fehlen. Bitte direction_of_vortex entsprechende bearbeiten. \n')
+        print('\n Die Benoetigten Parameter fehlen. Bitte direction_of_vortex entsprechende bearbeiten. Beachte die getätigen Ausgaben \n')
 
     elif definiert == True:
         print('\n Alle Variablen vorhanden, berechne Punkte \n')
