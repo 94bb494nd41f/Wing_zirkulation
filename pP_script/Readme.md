@@ -24,14 +24,22 @@ Bestimmung der Zirkulation auf Basis eines Vorticitymaximums. Der Bereich, in de
 Selbsterklärend, oder?
 
 ### Bestimmung des viskosen Radius / Wirbelkerndurchmesser nach Burgers
-p_min = Druckminimum
+p_min = Druckminimum 
+
 p_inf = umgebungsdruck
+
 \rho = dichte
+
 \Gamma = Zirkulation
+
 a = Radius des Wirbels
+
 \frac{p_{min}-p_{\infty}}{\rho} = -0.871 { \frac{\Gamma}{2 \pi a} }^2
+
  umgestellt zu 
+ 
  a = \frac{\Gamma}{2 \pi} [ \frac{p_min - p_inf}{\rho *-0.871}]^-0.5
+ 
  Die Bestimmung des Wirbelkerndurchmesser ist nur Verfügbar, wenn der "Druckmodus" genutzt und eine Wirbelachse definiert ist.
 
 ## Zirkulationsauswertung bei beliebiger Wirbelorientierung
