@@ -41,3 +41,4 @@ cd postProcessing
 #calculate circulation based on umlaufintegral
 python3 $py2 |tee log.calculation_gamma
 rm $py2
+rm p_min

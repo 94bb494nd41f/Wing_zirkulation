@@ -108,6 +108,13 @@ def find_max(array, xup, xlow, yup, ylow, zup, zlow, dummy):
         )
         return v_xyz_max_real, max_line, dummy
     if dummy == "p":
+
+        f = open('p_min', 'w')  # schreiben von xyz pmin in datei fuer bestimmung viskoser radius
+        f.write(str(max_line.item(0)) + ' , ')
+        f.write(str(max_line.item(1)) + ' , ')
+        f.write(str(max_line.item(2)) + ' , ')
+        f.write(str(p_min))
+        f.close
         return p_min, max_line, dummy
 
 
@@ -167,10 +174,7 @@ def avg_vorticity(array, max_line, radius ):
 
 def sampledict (punkte):
     cwd = os.getcwd()
-    print(cwd)
-    # os.path.abspath(os.path.join(__file__ ,"../.."))
-    # os.chdir('..')
-    # os.chdir('..')
+
     os.chdir('..')
     os.chdir(os.getcwd() + '/system/')
     # print(os.getcwd())
@@ -302,11 +306,11 @@ if __name__ == '__main__':
     # b_3=9
 
 
-
-
     ##########################################################################################################
     # keine Parameter mehr
     ##################################################################################################################
+
+
 
     array, dummy = Einlesen1(plotkind='wing') # liest die Druck oder Voritcity datei ein
 
@@ -364,6 +368,11 @@ if __name__ == '__main__':
                 print('\n Rechteckvektoren werden basierend auf wirbelachse berechnet \n')
                 a_1, a_2, a_3, b_1, b_2, b_3 = berechnung_Rechteckvektor(c_1, c_2, c_3)
 
+                x_core = max_line.item(0)
+                y_core = max_line.item(1)
+                z_core = max_line.item(2)
+                p_min = max_line.item(3)
+
                 definiert = True
 
 
@@ -395,8 +404,8 @@ if __name__ == '__main__':
             print('\n Vektoren werden Berechnet. \n')
             definiert = False
         else:
-            # print('Variablen definiert')
-            definiert = True
+             print('Variablen definiert')
+             definiert = True
 
 
         print('maximaler vorticity', max_vor, '\ncorresponding line:\n x \t | y\t| z\t| vorticity_X |v_y\t| v_z\n', \
@@ -432,30 +441,11 @@ if __name__ == '__main__':
             c_1 = alpha_cos
             c_2 = beta_cos
             c_3 = eta_cos
-            # confine system of equations
-            print('c1,c2,c3 normed to 1:\t ', c_1, c_2, c_3)
 
-            a_1 = c_1
-            a_2 = c_2
-            b_2 = c_2
+            a_1, a_2, a_3, b_1, b_2, b_3 = berechnung_Rechteckvektor(c_1, c_2, c_3)
 
-            # calculate missing parts of vectors
-            a_3 = -(c_1 ** 2 + c_2 ** 2) / c_3
-            b_1 = -(c_2 ** 2) / c_1
-
-            b_3 = (c_2 ** 2 - c_2 * b_2) / (c_3 - a_3)  # = 0, not needed
-
-            # norm vectors so a defined length
-            real_length = 0.4
-            length = real_length / 2
-            a_1, a_2, a_3 = length_norm(a_1, a_2, a_3, length)
-            b_1, b_2, b_3 = length_norm(b_1, b_2, b_3, length)
-            c_1, c_2, c_3 = length_norm(c_1, c_2, c_3, length)
-            print('\n c_i colinear to vortex, a,c,b are orthogonal to eachother and normed to a length of', length)
-            print('c1,c2,c3: \t', c_1, c_2, c_3)
-            print('a1,a2,a3: \t', a_1, a_2, a_3)
-            print('b1,b2,b3: \t', b_1, b_2, b_3)
             definiert = True
+
         elif definiert == True:
             print('!!!Achtung: Es werden die in \"Parameter\" definierten Vektoren genutzt ')
 
@@ -511,7 +501,6 @@ if __name__ == '__main__':
         x_e = x_core + a_1 - b_1
         y_e = y_core + a_2 - b_2
         z_e = z_core + a_3 - b_3
-
         punkte.append((x_s, y_s, z_s, x_e, y_e, z_e, 4))
 
         sampledict(punkte)  # schreibt die Punkte ins Sampledict

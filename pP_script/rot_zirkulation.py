@@ -190,8 +190,39 @@ def Einlesen():
 
 
 if __name__ == '__main__':
+    ################################################################################
+    # PARAMETER
+    #############################################################################
+
+    rho = 1 # in kg/m^3 nur für die Bestimmung des Viskosen Kerns wichtig
+
+
+    ############################################################################
+    # keine Parameter mehr
+    ####################################################################################
     print('Bitte README lesen')
-    c_gamma = Einlesen()
+
+    c_gamma = Einlesen() # berechnen Zirkulation
+    print('\n Ergebnisse:\n')
+    print('zirkulation:', c_gamma, ' m ^2/s \n')
+
+    cwd = os.getcwd()
+    if 'p_min' in os.listdir(cwd): # einlesen des Druckminimums, gefunden in "direction of vortex
+        p_file = np.genfromtxt('p_min', skip_header=0, dtype=float, delimiter=",")
+        pmin = p_file.item(3)
+
+        try:    # schauen ob rho definiert ist
+           rho
+        except NameError:
+            print('\n Achtung \n Rho nicht definiert!\n')
+
+        else:
+            print('\n Rho mit Rho=', rho, 'definiert')
+
+            Radius = c_gamma / (2* 3.1415926) * (pmin / (rho * -0.871))**-0.5
+
+            print('viskoser Radius:', Radius, 'm \n')
+
 
     print('\n \n -------------------------ende---------------------------------------')
 
