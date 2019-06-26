@@ -106,6 +106,14 @@ def find_max(array, xup, xlow, yup, ylow, zup, zlow, dummy):
         v_xyz_max_real = math.sqrt(
             max_line.item(3)**2 + max_line.item(4)**2 + max_line.item(5)**2
         )
+        f = open('v_max', 'w')  # schreiben von xyz v_i in datei fuer bestimmung viskoser radius
+        f.write(str(max_line.item(0)) + ' , ')
+        f.write(str(max_line.item(1)) + ' , ')
+        f.write(str(max_line.item(2)) + ' , ')
+        f.write(str(max_line.item(3)) + ' , ')
+        f.write(str(max_line.item(4)) + ' , ')
+        f.write(str(max_line.item(5)) + ' , ')
+        f.close
         return v_xyz_max_real, max_line, dummy
     if dummy == "p":
 
@@ -240,7 +248,6 @@ def berechnung_Rechteckvektor(c_1, c_2, c_3):
     b_3 = (c_2 ** 2 - c_2 * b_2) / (c_3 - a_3)  # = 0, not needed
 
     # norm vectors so a defined length
-    real_length = 0.4
     length = real_length / 2
     a_1, a_2, a_3 = length_norm(a_1, a_2, a_3, length)
     b_1, b_2, b_3 = length_norm(b_1, b_2, b_3, length)
@@ -267,7 +274,7 @@ if __name__ == '__main__':
     #
     #
     ##############################################################
-    real_length = 0.4  # absolute groeße des Fensters, ist quadratisch
+    real_length = 0.4 # absolute groeße des Fensters, ist quadratisch
 
     cellsize = 0.0082  # cellsize in core vortex
 
@@ -291,9 +298,9 @@ if __name__ == '__main__':
 
     #definition der Vektoren
     #Richtung des Wirbels:
-    c_1=3
-    c_2=4
-    c_3=5
+    # c_1=
+    # c_2=
+    # c_3=
     #
     # #Vektor fuer Rechteck in Richtung 1
     # a_1=9

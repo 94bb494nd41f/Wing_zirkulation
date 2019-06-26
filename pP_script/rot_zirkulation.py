@@ -221,7 +221,13 @@ if __name__ == '__main__':
 
             Radius = c_gamma / (2* 3.1415926) * (pmin / (rho * -0.871))**-0.5
 
-            print('viskoser Radius:', Radius, 'm \n')
+            print('viskoser Radius basierend auf Druck:', Radius, 'm \n')
+
+    if 'v_max' in os.listdir(cwd):
+        v_file = np.genfromtxt('v_max', skip_header=0, dtype=float, delimiter=",")
+        v_max = math.sqrt(v_file.item(3)**2 + v_file.item(4)**2 + v_file.item(5)**2)
+        Radius = math.sqrt(2.513 * c_gamma/(2*3.1415926 * v_max))
+        print('viskoser Radius basierend auf Wirbelstärke:', Radius, 'm \n')
 
     print('\n \n -------------------------ende---------------------------------------')
 
