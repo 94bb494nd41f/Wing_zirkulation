@@ -226,7 +226,8 @@ if __name__ == '__main__':
     if 'v_max' in os.listdir(cwd):
         v_file = np.genfromtxt('v_max', skip_header=0, dtype=float, delimiter=",")
         v_max = math.sqrt(v_file.item(3)**2 + v_file.item(4)**2 + v_file.item(5)**2)
-        Radius = math.sqrt(2.513 * c_gamma/(2*3.1415926 * v_max))
+        t = 2.513 * c_gamma /(2*3.1415926 * v_max)
+        Radius = math.sqrt(2.513 * abs(c_gamma) /(2*3.1415926 * v_max))
         print('viskoser Radius basierend auf Wirbelstärke:', Radius, 'm \n')
 
     print('\n \n -------------------------ende---------------------------------------')
