@@ -323,6 +323,7 @@ if __name__ == '__main__':
 
     #######################################################################
     #           Manuell Definiert
+    # geht nur, wenn weder vorticity noch Druck im postProcessing-ordner sind
     if dummy == "n":
         print('Verfahren im manuellen Modus')
         try:
@@ -354,6 +355,7 @@ if __name__ == '__main__':
                 x_core = x_c
                 y_core = y_c
                 z_core = z_c
+                print('Wirbelkern manuell definiert:', x_core, y_core, z_core)
 
 
     #############################################################################################################
@@ -382,7 +384,6 @@ if __name__ == '__main__':
 
                 definiert = True
 
-
         else:
             print('Variablen definiert')
             max_vor, max_line, dummy = find_max(array, xup, xlow, yup, ylow, zup, zlow,
@@ -394,6 +395,7 @@ if __name__ == '__main__':
 
             # check if Vectors are defined
             definiert = True
+        print('Wirbelkern auf Basis von Druck:', x_core, y_core, z_core)
     ############################################################################################################
     #          Vorticity
     if dummy == "v":  # wenn vorticity

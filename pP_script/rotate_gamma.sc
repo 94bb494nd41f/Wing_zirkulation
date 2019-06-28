@@ -11,7 +11,7 @@ py2=rot_zirkulation.py
 
 cd .. #needs to be run from case
 rm -r postProcessing
-
+mkdir postProcessing # muss erstellt werden, Manueller Modus geht nur wenn weder Druck, noch Vorticity vorhanden ist.
 # calculate vorticity
 #postProcess -func vorticity -latestTime |tee log.calculation_vorticity
 
@@ -44,3 +44,5 @@ python3 $py2 |tee log.calculation_gamma
 rm $py2
 rm p_min
 rm v_max
+rm -r sampleDict_plane_pressure
+rm -r sampleDict_plane_vorticity
