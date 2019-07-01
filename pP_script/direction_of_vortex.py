@@ -263,7 +263,7 @@ def sampledict (punkte):
 def Rotationsmatrix(c_1, c_2, c_3):
     # berechnung eines Vektors, senkrecht zu c
     startwert = 1  # initialwert fuer den Loeser fsolve
-
+    # fsolve returns nd.array, convert using float()
     if c_1 == 0 and c_2 == 0 and c_3 != 0:
         a_1 = 1
         a_2 = 1
@@ -301,6 +301,8 @@ def Rotationsmatrix(c_1, c_2, c_3):
         a_3 = 1
         func = lambda a_1: a_1 * c_1 + a_2 * c_2 + a_3 * c_3
         a_1 = fsolve(func, startwert)
+
+
     # erzeugung eines um 90, um c gedrehten vektors
 
 
@@ -327,9 +329,14 @@ def Rotationsmatrix(c_1, c_2, c_3):
     y32 = c_2*c_3* ncosa + c_1*sina
     y33 = c_3**2*ncosa+cosa
 
-    b_1 = y11 * a_1 + y12 * a_2 + y13 * a_3
-    b_2 = y21 * a_1 + y22 * a_2 + y23 * a_3
-    b_3 = y31 * a_1 + y32 * a_2 + y33 * a_3
+    # fsolve returns nd.array -> convert using float
+    b_1 = float(y11 * a_1 + y12 * a_2 + y13 * a_3)
+    b_2 = float(y21 * a_1 + y22 * a_2 + y23 * a_3)
+    b_3 = float(y31 * a_1 + y32 * a_2 + y33 * a_3)
+
+    a_1 = float(a_1)
+    a_2 = float(a_2)
+    a_3 = float(a_3)
 
     length = real_length / 2
     a_1, a_2, a_3 = length_norm(a_1, a_2, a_3, length)
