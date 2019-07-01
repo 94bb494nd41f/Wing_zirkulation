@@ -4,7 +4,7 @@ import math
 import numpy as np
 # from numpy import genfromtxt
 # os.system('postProcess -func sampleDict_plane_U')
-
+from scipy.optimize import fsolve
 
 def length_norm(x, y, z, length): # norming vector to a length
     f = length/math.sqrt(
@@ -235,27 +235,106 @@ def sampledict (punkte):
     return()
 
 
-def berechnung_Rechteckvektor(c_1, c_2, c_3):
-    #gewaehlte RB
-    a_1 = c_1
-    a_2 = c_2
-    b_2 = c_2
+# def berechnung_Rechteckvektor(c_1, c_2, c_3):
+#     #gewaehlte RB
+#     a_1 = c_1
+#     a_2 = c_2
+#     b_2 = c_2
+#
+#     # calculate missing parts of vectors
+#     a_3 = -(c_1 ** 2 + c_2 ** 2) / c_3
+#     b_1 = -(c_2 ** 2) / c_1
+#
+#     b_3 = (c_2 ** 2 - c_2 * b_2) / (c_3 - a_3)  # = 0, not needed
+#
+#     # norm vectors so a defined length
+#     length = real_length / 2
+#     a_1, a_2, a_3 = length_norm(a_1, a_2, a_3, length)
+#     b_1, b_2, b_3 = length_norm(b_1, b_2, b_3, length)
+#     c_1, c_2, c_3 = length_norm(c_1, c_2, c_3, length)
+#     print('\n c_i colinear to vortex, a,c,b are orthogonal to eachother and normed to a length of', length)
+#     print('c1,c2,c3: \t', c_1, c_2, c_3)
+#     print('a1,a2,a3: \t', a_1, a_2, a_3)
+#     print('b1,b2,b3: \t', b_1, b_2, b_3)
+#
+#     return a_1, a_2, a_3, b_1, b_2, b_3
 
-    # calculate missing parts of vectors
-    a_3 = -(c_1 ** 2 + c_2 ** 2) / c_3
-    b_1 = -(c_2 ** 2) / c_1
 
-    b_3 = (c_2 ** 2 - c_2 * b_2) / (c_3 - a_3)  # = 0, not needed
+def Rotationsmatrix(c_1, c_2, c_3):
+    # berechnung eines Vektors, senkrecht zu c
+    startwert = 1  # initialwert fuer den Loeser fsolve
 
-    # norm vectors so a defined length
+    if c_1 == 0 and c_2 == 0 and c_3 != 0:
+        a_1 = 1
+        a_2 = 1
+        a_3 = 0
+
+    if c_1 == 0 and c_2 != 0 and c_3 == 0:
+        a_1 = 1
+        a_2 = 0
+        a_3 = 1
+
+    if c_1 != 0 and c_2 == 0 and c_3 == 0:
+        a_1 = 0
+        a_2 = 1
+        a_3 = 1
+
+    if c_1 != 0 and c_2 != 0 and c_3 == 0:
+        a_1 = 1
+        a_3 = 1
+        func = lambda a_2: a_1 * c_1 + a_2 * c_2 + a_3 * c_3
+        a_2 = fsolve(func, startwert)
+
+    if c_1 != 0 and c_2 == 0 and c_3 != 0:
+        a_2 = 1
+        a_3 = 1
+        func = lambda a_1: a_1 * c_1 + a_2 * c_2 + a_3 * c_3
+        a_1 = fsolve(func, startwert)
+    if c_1 == 0 and c_2 != 0 and c_3 != 0:
+        a_1 = 1
+        a_3 = 1
+        func = lambda a_2: a_1 * c_1 + a_2 * c_2 + a_3 * c_3
+        a_2 = fsolve(func, startwert)
+
+    if c_1 != 0 and c_2 != 0 and c_3 != 0:
+        a_2 = 1
+        a_3 = 1
+        func = lambda a_1: a_1 * c_1 + a_2 * c_2 + a_3 * c_3
+        a_1 = fsolve(func, startwert)
+    # erzeugung eines um 90, um c gedrehten vektors
+
+
+    # 1 Berechnung der Matrix, mit der letztlich Vektor berechnet wird
+    drehwinkel = 90 # drehung um 90 grad
+    # 1-cos alpha
+    alpha = drehwinkel * np.pi / 180
+    # cos alpha
+    cosa = np.cos(alpha)
+    # sin alpha
+    sina = np.sin(alpha)
+    # 1- cos alpha
+    ncosa = 1 - np.cos(alpha)
+
+    y11 = c_1**2 * ncosa + cosa
+    y12 = c_1*c_2 * ncosa - c_3 * sina
+    y13 = c_1*c_3 * ncosa + c_2 * sina
+
+    y21 = c_1 * c_2 * ncosa + c_3 * sina
+    y22 = c_2**2 * ncosa + cosa
+    y23 = c_2*c_3*ncosa - c_1*sina
+
+    y31 = c_1*c_3*ncosa - c_2*sina
+    y32 = c_2*c_3* ncosa + c_1*sina
+    y33 = c_3**2*ncosa+cosa
+
+    b_1 = y11 * a_1 + y12 * a_2 + y13 * a_3
+    b_2 = y21 * a_1 + y22 * a_2 + y23 * a_3
+    b_3 = y31 * a_1 + y32 * a_2 + y33 * a_3
+
     length = real_length / 2
     a_1, a_2, a_3 = length_norm(a_1, a_2, a_3, length)
     b_1, b_2, b_3 = length_norm(b_1, b_2, b_3, length)
     c_1, c_2, c_3 = length_norm(c_1, c_2, c_3, length)
-    print('\n c_i colinear to vortex, a,c,b are orthogonal to eachother and normed to a length of', length)
-    print('c1,c2,c3: \t', c_1, c_2, c_3)
-    print('a1,a2,a3: \t', a_1, a_2, a_3)
-    print('b1,b2,b3: \t', b_1, b_2, b_3)
 
     return a_1, a_2, a_3, b_1, b_2, b_3
 
@@ -298,15 +377,16 @@ if __name__ == '__main__':
 
     #definition der Vektoren
     #Richtung des Wirbels:
-    # c_1=
-    # c_2=
-    # c_3=
+    c_1= 1
+    c_2= 0
+    c_3= 0
     #
+
     # #Vektor fuer Rechteck in Richtung 1
     # a_1=9
     # a_2=9
     # a_3=9
-    #
+
     # # Vektor fuer Rechteck in Richtung 2
     # b_1=9
     # b_2=9
@@ -338,7 +418,7 @@ if __name__ == '__main__':
             else:
                 print('\n Rechteckvektoren werden basierend auf wirbelachse berechnet \n')
 
-                a_1, a_2, a_3, b_1, b_2, b_3 = berechnung_Rechteckvektor(c_1, c_2, c_3)
+                a_1, a_2, a_3, b_1, b_2, b_3 = Rotationsmatrix(c_1, c_2, c_3)
 
                 definiert = True
 
@@ -375,7 +455,7 @@ if __name__ == '__main__':
                 definiert = False
             else:
                 print('\n Rechteckvektoren werden basierend auf wirbelachse berechnet \n')
-                a_1, a_2, a_3, b_1, b_2, b_3 = berechnung_Rechteckvektor(c_1, c_2, c_3)
+                a_1, a_2, a_3, b_1, b_2, b_3 = Rotationsmatrix(c_1, c_2, c_3)
 
                 x_core = max_line.item(0)
                 y_core = max_line.item(1)
@@ -451,7 +531,7 @@ if __name__ == '__main__':
             c_2 = beta_cos
             c_3 = eta_cos
 
-            a_1, a_2, a_3, b_1, b_2, b_3 = berechnung_Rechteckvektor(c_1, c_2, c_3)
+            a_1, a_2, a_3, b_1, b_2, b_3 = Rotationsmatrix(c_1, c_2, c_3)
 
             definiert = True
 
