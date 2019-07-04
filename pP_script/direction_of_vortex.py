@@ -6,6 +6,7 @@ import numpy as np
 # os.system('postProcess -func sampleDict_plane_U')
 from scipy.optimize import fsolve
 
+
 def length_norm(x, y, z, length): # norming vector to a length
     f = length/math.sqrt(
         x**2 + y**2 + z**2
@@ -19,24 +20,30 @@ def length_norm(x, y, z, length): # norming vector to a length
 def Einlesen1(plotkind):
     cwd = os.getcwd()
     print('\n das ist die cwd:\n ', cwd, '\n')
-    # t1 = os.path.getctime(cwd + '/sampleDict_plane_vorticity')
-    # t2 = os.path.getctime(cwd + '/sampleDict_plane_pressure')
-    if 'sampleDict_plane_vorticity' in os.listdir(cwd) and 'sampleDict_plane_pressure' in os.listdir(cwd):
-        if os.path.getctime(cwd + '/sampleDict_plane_vorticity') > os.path.getctime(cwd + '/sampleDict_plane_pressure'):
-            # determine the newest File/ Folder
-            os.chdir(cwd + '/sampleDict_plane_vorticity')
-        elif os.path.getctime(cwd + '/sampleDict_plane_vorticity') < os.path.getctime(cwd + '/sampleDict_plane_pressure'):
-            os.chdir(cwd + '/sampleDict_plane_pressure')
 
-    elif 'sampleDict_plane_vorticity' not in os.listdir(cwd) or 'sampleDict_plane_pressure' not in os.listdir(cwd):
-        if 'sampleDict_plane_pressure' in os.listdir(cwd):
-            os.chdir(cwd + '/sampleDict_plane_pressure')
-        if 'sampleDict_plane_vorticity' in os.listdir(cwd):
-            os.chdir(cwd + '/sampleDict_plane_vorticity')
-        if 'sampleDict_plane_vorticity' not in os.listdir(cwd) and 'sampleDict_plane_pressure' not in os.listdir(cwd):
-            dummy = 'n'
-            array = None
-            return array, dummy
+    #liste aller datein
+    liste_pre = os.listdir(cwd)
+    liste = []
+    # Reduzierung auf nur Folders
+    for j in liste_pre:
+        print
+        if os.path.isdir(cwd+'/'+j) == True:
+            if 'sampleDict_plane' in j:
+                liste.append(j)
+    if len(liste) != 0:
+        neust = max(liste, key=os.path.getctime)
+        print('neuster Ordner', neust)
+    elif len(liste) == 0:
+        dummy = 'n'
+        array = None
+        return array, dummy
+
+    if 'sampleDict_plane_vorticity' in neust:
+        os.chdir(cwd + '/sampleDict_plane_vorticity')
+    if 'sampleDict_plane_pressure' in neust:
+        os.chdir(cwd + '/sampleDict_plane_pressure')
+    if 'sampleDict_plane_lambda' in neust:
+        os.chdir(cwd + '/sampleDict_plane_lambda')
 
     list_timesteps = os.listdir(os.getcwd())
     print('Timesteps', list_timesteps)
@@ -63,79 +70,86 @@ def Einlesen1(plotkind):
                 os.chdir(cwd)
                 dummy = "p"
                 return pressure_1, dummy
+            if filename[0] == 'L':
+                # x  y  z  vorticity_x  vorticity_y  vorticity_z ndarray
+                lambda2_1 = np.genfromtxt(str(filename), skip_header=2, dtype=float)
+                os.chdir(cwd)
+                dummy = "l"
+                return lambda2_1, dummy
 
 
-def find_max(array, xup, xlow, yup, ylow, zup, zlow, dummy):
+def find_max(array,dummy, xz, yz, zz, rad):
     # x  y  z  vorticity_x  vorticity_y  vorticity_z ndarray
     # init values
     if dummy == "v":
         v_xyz_max = array.item((0, 3))**2 + array.item((0, 4))**2 + array.item((0, 5))**2
     elif dummy == "p":
         p_min = array.item((0, 3))
-    max_line = array.item(0)
+        #max_line = array.item(0)
+    elif dummy == "l":\
+        lambda2_max = array.item((0, 3))
+        #max_line = array.item(0)
 
-    # boundaries
-    x_bound = [xup, xlow]
-    x_bound.sort()  # now x_bound=[x_low,x_up]
-
-    y_bound = [yup, ylow]
-    y_bound.sort()
-
-    z_bound = [zup, zlow]
-    z_bound.sort()
+    # die suche hier scheint mir arg unelegant: never change a running system
 
     for i in array:
-        if x_bound[0] < i.item(0) < x_bound[1]:
-            if y_bound[0] < i.item(1) < y_bound[1]:
-                if z_bound[0] < i.item(2) < z_bound[1]:
+        if ((i.item(0)-xz)**2+(i.item(1)-yz)**2+(i.item(2)-zz)**2) < rad**2:
+            if dummy == "v":  # looking for vorticity max
+                v_xyz_new = i.item(3) ** 2 + i.item(4) ** 2 + i.item(5) ** 2
+                if v_xyz_new > v_xyz_max:
+                    max_line = i
+                    v_xyz_max = v_xyz_new
+                    # print('current_vor:', v_xyz_new, 'max_vor', v_xyz_max)
+                    # print('\n i\n', i, 'max_line \n', max_line)
+            elif dummy == "p":  # looking for min pressure
+                p_min_new = i.item(3)
+                if p_min > p_min_new:
+                    p_min = p_min_new
+                    max_line = i
+            elif dummy == "l":  # looking for min pressure
+                lambda2_new = i.item(3)
+                if lambda2_max < lambda2_new:
+                    lambda2_max = lambda2_new
+                    max_line = i
 
-                    if dummy == "v": # looking for vorticity max
-                        v_xyz_new = i.item(3) ** 2 + i.item(4) ** 2 + i.item(5) ** 2
-                        if v_xyz_new > v_xyz_max:
-                            max_line = i
-                            v_xyz_max = v_xyz_new
-                            #print('current_vor:', v_xyz_new, 'max_vor', v_xyz_max)
-                            #print('\n i\n', i, 'max_line \n', max_line)
-                    elif dummy == "p": # looking for min pressure
-                        p_min_new = i.item (3)
-                        if p_min > p_min_new:
-                            p_min = p_min_new
-                            max_line = i
+    try:
+        max_line
+    except NameError:
+        print('\n Es liegen keine Werte im definierten Bereich. Bitte neuen suchbereich definieren.\n')
+    else:
+        if dummy == "v":
+            v_xyz_max_real = math.sqrt(
+                max_line.item(3)**2 + max_line.item(4)**2 + max_line.item(5)**2
+            )
+            f = open('v_max', 'w')  # schreiben von xyz v_i in datei fuer bestimmung viskoser radius
+            f.write(str(max_line.item(0)) + ' , ')
+            f.write(str(max_line.item(1)) + ' , ')
+            f.write(str(max_line.item(2)) + ' , ')
+            f.write(str(max_line.item(3)) + ' , ')
+            f.write(str(max_line.item(4)) + ' , ')
+            f.write(str(max_line.item(5)) + ' , ')
+            f.close
+            return v_xyz_max_real, max_line, dummy
+        if dummy == "p":
 
-    if dummy == "v":
-        v_xyz_max_real = math.sqrt(
-            max_line.item(3)**2 + max_line.item(4)**2 + max_line.item(5)**2
-        )
-        f = open('v_max', 'w')  # schreiben von xyz v_i in datei fuer bestimmung viskoser radius
-        f.write(str(max_line.item(0)) + ' , ')
-        f.write(str(max_line.item(1)) + ' , ')
-        f.write(str(max_line.item(2)) + ' , ')
-        f.write(str(max_line.item(3)) + ' , ')
-        f.write(str(max_line.item(4)) + ' , ')
-        f.write(str(max_line.item(5)) + ' , ')
-        f.close
-        return v_xyz_max_real, max_line, dummy
-    if dummy == "p":
+            f = open('p_min', 'w')  # schreiben von xyz pmin in datei fuer bestimmung viskoser radius
+            f.write(str(max_line.item(0)) + ' , ')
+            f.write(str(max_line.item(1)) + ' , ')
+            f.write(str(max_line.item(2)) + ' , ')
+            f.write(str(p_min))
+            f.close
+            return p_min, max_line, dummy
 
-        f = open('p_min', 'w')  # schreiben von xyz pmin in datei fuer bestimmung viskoser radius
-        f.write(str(max_line.item(0)) + ' , ')
-        f.write(str(max_line.item(1)) + ' , ')
-        f.write(str(max_line.item(2)) + ' , ')
-        f.write(str(p_min))
-        f.close
-        return p_min, max_line, dummy
+        if dummy == "l":
+            return lambda2_max, max_line, dummy
 
 
 def avg_vorticity(array, max_line, radius ):
     n = 0
     avg_list = []
-    #np.array(avg_list,)
     avg_x = 0
     avg_y = 0
     avg_z = 0
-    sig_x = np.sign(max_line.item(0))
-    sig_y = np.sign(max_line.item(1))
-    sig_z = np.sign(max_line.item(2))
 
     #determine boundaries
     x_bound = [max_line.item(0) + radius, max_line.item(0) - radius ]
@@ -177,7 +191,6 @@ def avg_vorticity(array, max_line, radius ):
     n_line = (max_line.item(0), max_line.item(1), max_line.item(2), avg_x, avg_y, avg_z)
     n_line = np.asanyarray(n_line)
     return avg_vort, n_line
-
 
 
 def sampledict (punkte):
@@ -235,31 +248,6 @@ def sampledict (punkte):
     return()
 
 
-# def berechnung_Rechteckvektor(c_1, c_2, c_3):
-#     #gewaehlte RB
-#     a_1 = c_1
-#     a_2 = c_2
-#     b_2 = c_2
-#
-#     # calculate missing parts of vectors
-#     a_3 = -(c_1 ** 2 + c_2 ** 2) / c_3
-#     b_1 = -(c_2 ** 2) / c_1
-#
-#     b_3 = (c_2 ** 2 - c_2 * b_2) / (c_3 - a_3)  # = 0, not needed
-#
-#     # norm vectors so a defined length
-#     length = real_length / 2
-#     a_1, a_2, a_3 = length_norm(a_1, a_2, a_3, length)
-#     b_1, b_2, b_3 = length_norm(b_1, b_2, b_3, length)
-#     c_1, c_2, c_3 = length_norm(c_1, c_2, c_3, length)
-#     print('\n c_i colinear to vortex, a,c,b are orthogonal to eachother and normed to a length of', length)
-#     print('c1,c2,c3: \t', c_1, c_2, c_3)
-#     print('a1,a2,a3: \t', a_1, a_2, a_3)
-#     print('b1,b2,b3: \t', b_1, b_2, b_3)
-#
-#     return a_1, a_2, a_3, b_1, b_2, b_3
-
-
 def Rotationsmatrix(c_1, c_2, c_3):
     # berechnung eines Vektors, senkrecht zu c
     startwert = 1  # initialwert fuer den Loeser fsolve
@@ -302,9 +290,7 @@ def Rotationsmatrix(c_1, c_2, c_3):
         func = lambda a_1: a_1 * c_1 + a_2 * c_2 + a_3 * c_3
         a_1 = fsolve(func, startwert)
 
-
     # erzeugung eines um 90, um c gedrehten vektors
-
 
     # 1 Berechnung der Matrix, mit der letztlich Vektor berechnet wird
     drehwinkel = 90 # drehung um 90 grad
@@ -347,36 +333,27 @@ def Rotationsmatrix(c_1, c_2, c_3):
 
 
 if __name__ == '__main__':
+    ############################################################
     # Parameter
-    ######################################################
-    #   _________________
-    #   |                |
-    #   |                |
-    #   |        +       |       das soll quadratisch sein
-    #   |                |
-    #   |________________|
-    #    <--------------->
-    #       real_length
-    #
-    #
-    ##############################################################
+    #################################################
+    # Bereich, in dem nach min/max gesucht werden soll
+    # Mittelpunkt des Kreises
+    xz = 1
+    yz = 0.05
+    zz = 0.8
+    # Radius des Kreises
+    rad = 10
+
+
+    # wie weit im Wirbelstärkenmodus gemittelt werden soll
     real_length = 0.4 # absolute groeße des Fensters, ist quadratisch
 
     cellsize = 0.0082  # cellsize in core vortex
 
-    cellcount = 20      # calculates with the cellsize to the radius, which is used to average around the maximum
+    cellcount = 0      # calculates with the cellsize to the radius, which is used to average around the maximum
+    radius = abs(cellcount * cellsize)
 
-    # Grenzen in denen Nach Maxi/minima gesucht werden soll
-    xup =10000
-    xlow =-10000
 
-    yup = 10000
-    ylow = -10000
-
-    zup = 10000
-    zlow = -10000
-
-    radius = cellcount * cellsize
     # Manuelle Definition des Zentrums
     #x_c
     #y_c
@@ -403,10 +380,31 @@ if __name__ == '__main__':
     ##########################################################################################################
     # keine Parameter mehr
     ##################################################################################################################
+    ##################################################################################
 
+    array, dummy = Einlesen1(plotkind='wing') # liest die Druck oder Voritcity Datei ein
 
+    #########################################################################################
+    #   Berechnung der Grenzen, in denen max/min gesuchen werden soll
+    # Grenzen in denen Nach Maxi/minima gesucht werden soll
+    try:
+        xz, yz, zz, rad
+    except NameError:
+        print('\n Der max/min Suchbereich ist nicht begrenzt\n')
+        xz = 0
+        yz = 0
+        zz = 0
+        rad = 100000
+    else:
+        xup = xz+rad
+        xlow = xz -rad
 
-    array, dummy = Einlesen1(plotkind='wing') # liest die Druck oder Voritcity datei ein
+        yup = yz + rad
+        ylow = yz - rad
+
+        zup = zz + rad
+        zlow = zz - rad
+        print('\n Suchbereich weißt folgende Grenzen auf (x|y|z) \t', xup, xlow, '|', yup, ylow, '|', zup, zlow, '\n')
 
     #######################################################################
     #           Manuell Definiert
@@ -414,11 +412,11 @@ if __name__ == '__main__':
     if dummy == "n":
         print('Verfahren im manuellen Modus')
         try:
-            a_1 and a_2 and a_3 and b_1 and b_2 and b_3
+            a_1, a_2, a_3, b_1, b_2, b_3
         except NameError:
             print('\n Vektoren fuer Liniengeneration (\" Rechteckvektoren\") fehlen\n')
             try:
-                c_1 and c_2 and c_3
+                c_1, c_2, c_3
             except NameError:
                 print('\n Wirbelachse definieren, Rechteckvektoren koennen nicht berechnet werden\n')
                 definiert = False
@@ -433,7 +431,7 @@ if __name__ == '__main__':
             print('\n Vektoren definiert\n ')
             definiert = True
         try:
-            x_c and y_c and z_c
+            x_c, y_c, z_c
         except NameError:
             print('\n wirbelzentrum nicht definiert')
             definiert = False
@@ -449,14 +447,13 @@ if __name__ == '__main__':
     #               Druck
     if dummy == "p":
         print('Verfahren im Druck Modus')
-        max_vor, max_line, dummy = find_max(array, xup, xlow, yup, ylow, zup, zlow,
-                                            dummy)  # Bestimmung des maxi/minimalen werts
+        max_vor, max_line, dummy = find_max(array, dummy, xz, yz, zz, rad)  # Bestimmung des maxi/minimalen werts
         try:
-            a_1 and a_2 and a_3 and b_1 and b_2 and b_3
+            a_1, a_2, a_3, b_1, b_2, b_3
         except NameError:
             print('\n Vektoren fuer Liniengeneration (\" Rechteckvektoren\") fehlen\n')
             try:
-                c_1 and c_2 and c_3
+                c_1, c_2, c_3
             except NameError:
                 print('\n Wirbelachse definieren, Rechteckvektoren werden auf dieser Basis berchnet\n')
                 definiert = False
@@ -473,8 +470,6 @@ if __name__ == '__main__':
 
         else:
             print('Variablen definiert')
-            max_vor, max_line, dummy = find_max(array, xup, xlow, yup, ylow, zup, zlow,
-                                                dummy)  # Bestimmung des maxi/minimalen werts
             x_core = max_line.item(0)
             y_core = max_line.item(1)
             z_core = max_line.item(2)
@@ -483,19 +478,57 @@ if __name__ == '__main__':
             # check if Vectors are defined
             definiert = True
         print('Wirbelkern auf Basis von Druck:', x_core, y_core, z_core)
+
+    #############################################################################################################
+    #               Lambda
+    if dummy == "l":
+        print('Verfahren im  Lambda2 Modus')
+        max_vor, max_line, dummy = find_max(array, dummy, xz, yz, zz, rad)  # Bestimmung des maxi/minimalen werts
+        try:
+            a_1, a_2, a_3, b_1, b_2, b_3
+        except NameError:
+            print('\n Vektoren fuer Liniengeneration (\" Rechteckvektoren\") fehlen\n')
+            try:
+                c_1, c_2, c_3
+            except NameError:
+                print('\n Wirbelachse definieren, Rechteckvektoren werden auf dieser Basis berchnet\n')
+                definiert = False
+            else:
+                print('\n Rechteckvektoren werden basierend auf wirbelachse berechnet \n')
+                a_1, a_2, a_3, b_1, b_2, b_3 = Rotationsmatrix(c_1, c_2, c_3)
+
+                x_core = max_line.item(0)
+                y_core = max_line.item(1)
+                z_core = max_line.item(2)
+                lambda2_max = max_line.item(3)
+
+                definiert = True
+
+        else:
+            print('Variablen definiert')
+            x_core = max_line.item(0)
+            y_core = max_line.item(1)
+            z_core = max_line.item(2)
+            p_min = max_line.item(3) #fuer Berechnung des Viskosen durchmessers
+
+            # check if Vectors are defined
+            definiert = True
+        print('Wirbelkern auf Basis von Lambda2:', x_core, y_core, z_core)
     ############################################################################################################
     #          Vorticity
     if dummy == "v":  # wenn vorticity
         print('Verfahren im Vorticity Modus')
 
-        max_vor, max_line, dummy = find_max(array, xup, xlow, yup, ylow, zup, zlow,
-                                            dummy)  # Bestimmung des maxi/minimalen werts
-        max_vor, max_line = avg_vorticity(array, max_line, radius)  # Mittelung
+        max_vor, max_line, dummy = find_max(array, dummy,xz,yz,zz,rad)  # Bestimmung des maxi/minimalen werts
+        if radius != 0:
+            max_vor, max_line = avg_vorticity(array, max_line, radius)  # Mittelung
+        else:
+            print('\n Wirbelstaerke wird nicht gemittelt \n')
 
 
         # checken ob Vektoren definiert sind
         try:
-            a_1 and a_2 and a_3 and b_1 and b_2 and b_3
+            a_1, a_2, a_3, b_1, b_2, b_3
         except NameError:
             print('\n Vektoren werden Berechnet. \n')
             definiert = False
