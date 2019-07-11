@@ -35,8 +35,8 @@ surfaces
         planeType		pointAndNormal;
         pointAndNormalDict
         {
-        basePoint       (0.73152 0 0);
-        normalVector    (1 0 0);
+        point       (1 0 0);
+        normal    (1 0 0);
         }
         interpolate		true;
 		triangulate		true;         

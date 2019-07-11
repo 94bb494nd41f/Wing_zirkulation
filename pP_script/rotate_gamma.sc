@@ -18,10 +18,11 @@ mkdir postProcessing # muss erstellt werden, Manueller Modus geht nur wenn weder
 # !!!!! Druck oder Vorticity!!!!!!
 
 # sample vortex plane
-# postProcess -func sampleDict_plane_vorticity -latestTime |tee log.vortex_plane
+postProcess -func sampleDict_plane_vorticity -latestTime |tee log.vortex_plane
 ################### oder #####################
 #postProcess -func sampleDict_plane_pressure -latestTime |tee log.pressure_plane
-postProcess -func sampleDict_plane_lambda -latestTime |tee log.lambda_plane
+################### oder #####################
+#postProcess -func sampleDict_plane_lambda -latestTime |tee log.lambda_plane
 
 #cd pP_script #  tools  need to be run from this folder
 
@@ -33,7 +34,7 @@ rm $py1
 
 cd ..
 #read out defined lines
-postProcess -func sampleDict_python_plotlines |tee log.sampling
+postProcess -func sampleDict_python_plotlines -latestTime |tee log.sampling
 
 
 cp pP_script/$py2 postProcessing/

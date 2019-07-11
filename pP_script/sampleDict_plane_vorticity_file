@@ -35,8 +35,8 @@ surfaces
         planeType		pointAndNormal;
         pointAndNormalDict
         {
-        basePoint       (1 0 0);
-        normalVector    (1 0 0);
+        point       (1 0 0);
+        normal    (1 0 0);
         }
         interpolate		true;
 		triangulate		true;         
@@ -49,9 +49,9 @@ surfaces
 fields
 (
     vorticity
-   Lambda2
+ //  Lambda2
  //  U
-	 p
+//	 p
 //  Lambda2Mean
 );
 

@@ -165,7 +165,7 @@ def Einlesen():
                 # print('n:',n)
                 if aa == 1 and bb == 1 and cc == 1 and dd == 1:
                     # if not mydata_1 and mydata_2 and mydata_3 and mydata_4:
-                    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+                    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
                     #                        -u_z 2
                     #            ____________________________
                     #            |           <-              |
@@ -181,13 +181,9 @@ def Einlesen():
                     summe_4 = integration(mydata_4)
                     gamma_total = summe_1 + summe_2 + summe_3 + summe_4
                     #  mydata: X|y|z|ux|uy|uz
-                    print('gamma_total', gamma_total)
-                    # c_gamma.append((mydata_1.item((0, 0)), gamma_total))
 
-        # plotting(c_gamma, )
         os.chdir(cwd)
     return (gamma_total)
-
 
 if __name__ == '__main__':
     ################################################################################
@@ -217,11 +213,11 @@ if __name__ == '__main__':
             print('\n Achtung \n Rho nicht definiert!\n')
 
         else:
-            print('\n Rho mit Rho=', rho, 'definiert')
+            print('\n Rho mit Rho=', rho, '\n', 'p_min:', pmin, 'definiert')
 
             Radius = c_gamma / (2* 3.1415926) * (pmin / (rho * -0.871))**-0.5
 
-            print('viskoser Radius basierend auf Druck:', Radius, 'm \n')
+            print('viskoser Radius basierend auf Druck:', Radius, 'meter \n')
 
     if 'v_max' in os.listdir(cwd):
         v_file = np.genfromtxt('v_max', skip_header=0, dtype=float, delimiter=",")
