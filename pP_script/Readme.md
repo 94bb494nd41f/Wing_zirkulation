@@ -6,14 +6,16 @@ pP_script/rotate_gamma.sc
 
 Die Tools müssen aus dem pP_script Ordner mit *./* gestartet werden. Unter Umständen muss vorher noch chmod +x angewandt werden um die Datei ausführbar zu machen. 
 ## Was kann das Tool?
-### Bestimmung auf Basis des Druckminimums
-Bestimmung der Zirkulation auf Basis eines Druckminimums. Der Bereich, in dem der Wirbel gesucht werden soll, kann durch Gebietsdefinition eingeschränkt werden. Es ist daher auch möglich in Ebenen zu suchen, die die Grenzschicht schneiden. 
+Das Tool kann über Lambda2 (max), Druck(min) oder Vorticity(max) das Wirbelzentrum bestimmen, über die Vorticity kann gleichzeitig auch die Wirbelachse berechnet werden.
 
-Bei dieser Variante muss eine Wirbelachse definiert werden. Aus der Wirbelachse werden die zum Aufspannen des Rechtecks benötigten Vektoren berechnet. Die Orientierunt der Seiten des Rechtecks im Raum ist dabei beliebig. Das Gleichungssystem zur bestimmtung der "Rechteck-Vektoren" hat drei Freiheitsgrade, die willkürlich beschränkt wurden. Forderung der Art "Rechteckseite A parallel zu Y-Achse" können daher implementiert werden.
+### Bestimmung auf Basis des Druckminimums oder Lambda2
+Bestimmung der Zirkulation auf Basis eines Druckminimums oder Lambda2 maximums. Der Bereich, in dem der Wirbel gesucht werden soll, kann durch Gebietsdefinition eingeschränkt werden. Es ist daher auch möglich in Ebenen zu suchen, die die Grenzschicht schneiden. 
+
+Bei dieser Variante muss eine Wirbelachse definiert werden. Aus der Wirbelachse werden die zum Aufspannen des Rechtecks benötigten Vektoren berechnet. Die Orientierunt der Seiten des Rechtecks im Raum ist dabei beliebig. 
 
 Es können auch die Vektoren definiert werden, die das Rechteck aufspannen. Eine Wirbelachse wird hierbei nicht benötigt.
 
-Das Rechteck wird um das Druckminimum aufgespannt.
+Das Rechteck wird um den Wirbelkern aufgespannt aufgespannt.
 
 
 ### Bestimmung auf Basis des Voritcitymaximums
@@ -58,46 +60,39 @@ Das Tool wählt in dem Ordner /postProcessing immer den aktuellsten eintrag von 
 
 
 ## direction_of_vortex.py
-Schneidet die definierte Ebene eine Grenzschicht oder möchte man die Suche nach einem Mini/maxima einschränken, kann dies über die Parameter *xup*, *xlow* etc geschehen. Soll keine Einschränkung erfolgen müssen diese Parameter entsprechend hoch gewählt werden.
-Folgende Parameter können editiert werden:
+#Parameter
 
-    real_length = 0.4  # absolute groeße des Fensters, ist quadratisch
-    
-    cellsize = 0.0082  # cellsize in core vortex
+*xz*, *yz*, *zz*, *rad* (float in m, not null) Einschränken des Suchbereichs. Schneidet die definierte Ebene eine Grenzschicht oder möchte man die Suche nach einem Mini/maxima einschränken, kann dies über die Definition eines Punktes und einem Radius abgehend von diesem Punkt geschehen. Soll keine Einschränkung erfolgen müssen diese Parameter entsprechend hoch gewählt werden.
 
-    cellcount = 20      # calculates with the cellsize to the radius, which is used to average around the maximum
+*real_length* (float in m, not null) Größe des Rechtecks, dass später um den Wirbelkern gelegt wird. 
+*cellsize*(float in m), *cellcount*(int(float möglich)), Mittelung der Vorticity. Alle Punkte die innerhalb des *radius*liegen, werden zur Mittlung genutzt. Der *radius*(berechnet sich normalerweise, kann manuell definiert werden)  kann direkt definiert werden, oder aber über das Produkt aus *cellsize* (im Wirbelkern) und der Anzahl der Zellen (*cellcount*) in einer Richtung, über die gemittelt werden soll.
 
-    # Grenzen in denen Nach Maxi/minima gesucht werden soll
-    xup =10000
-    xlow =-10000
+*x_c*, *y_c*, z_c*(float in m) manuelle definition eines Wirbelzentrums, funktioniert nur im Manuellen Modus(-> keinerlei "sampleDichts[..]" im postProcessing Ordner) 
 
-    yup = 10000
-    ylow = -10000
+*c_i*(float in m) manuelle definition einer Wirbelachse. Auf dieser Basis können auch die Rechteckvektoren berechnet werden. Wenn nicht definiert _muss_ der Vorticity modus genutzt werden. 
+*a_i*, *b_i* Rechteckvektoren, falls nicht definiert werden diese über die Wirbelachse berechnet. 
 
-    zup = 10000
-    zlow = -10000
+#Funktionen innerhalb des Programms
 
-    radius = cellcount * cellsize
-    # Manuelle Definition des Zentrums
-    #x_c
-    #y_c
-    #z_c
+**def length_norm(x, y, z, length):** normt den Vektor xyz auf die Länge length
 
-    #definition der Vektoren
-    #Richtung des Wirbels:
-    c_1=3
-    c_2=4
-    c_3=5
-    
-    # #Vektor fuer Rechteck in Richtung 1
-    # a_1=9
-    # a_2=9
-    # a_3=9
-    
-    # # Vektor fuer Rechteck in Richtung 2
-    # b_1=9
-    # b_2=9
-    # b_3=9
+**def Einlesen1():** ließt die Daten ein. Ordnerstruktur muss '../postProcessing/sampleDict_plane_XX/timestep/' sein, XX steht für pressure/lambda/vorticity.
+Die Funktion gibt *array* und *dummy* wieder, array beinhaltet die eingelesenen Daten, *dummy* nimmt "n" für den manuellen Modus, "v" für Vorticity, "p" für Druck und "l" für Lambda2 an. Wichtig für die weiter Datenverarbeitung.
+
+**def find_max(array, dummy, xz, yz, zz, rad):** Findet das Maximum/Minimum in einem Bereich der durch den Punkt(xz, yz, zz) und dem Radius (rad) definiert ist. Das Minimum des Drucks und das Maximum der Wirbelstärke werden in eine Datei geschrieben, auf ihrer Basis wird im zweiten Teil der Wirbelkerndurchmesser berechnet. 
+
+**def avg_vorticity(array, max_line, radius ):** Mittelt die Voritcity im Radius (radius) um ihr Maximum (max_line), die Wirbelachse kann so genauer bestimmt werden. Nur für Wirbelstärkenmodus verfügbar.
+
+**def sampledict (punkte):** schreibt die zu sampelnden Linien raus, auf deren Basis später die Zirkulation berechnet werden soll in eine für openFoam zu lesende Datei. 
+
+**def Rotationsmatrix(c_1, c_2, c_3):** Bestimmt einen Vektor a, der Senkrecht auf Vektor c (Wirbelachse) steht. Vektor b ergibt sich aus Vektor a, der um 90 Grad um Vektor c gedreht wurde. siehe https://de.wikipedia.org/wiki/Drehmatrix
+
+
+
+## rot_zirkulation.py
+# Parameter
+*rho* (float in kg/m³, not null) Wird für die Berechnung des Wirbelkerndurchmessers basierend auf Druck benötigt.
+
 
 ### Vorticity
 In direction_of_vortex wird die die maximale Voriticity bestimmt und ein Vektor kollinear zum Wirbelkern bestimmt. 
