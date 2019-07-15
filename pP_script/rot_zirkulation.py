@@ -4,8 +4,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
-
-
 def integration(data_array):
     #############################################################
     # get orientation of vector and norm it to one to later calculate the velocity along the line
@@ -39,48 +37,6 @@ def integration(data_array):
             v_3 * data_array.item((len_array, 5))
     )
     return summe
-
-
-# def intalt():
-#
-#     norm = max(v_1, v_2, v_3)
-#     v_1 = v_1 / norm
-#     v_2 = v_2 / norm
-#     v_3 = v_3 / norm
-#
-#     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#     # Watch out for len_array already reduced by one!
-#     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#     len_array = len(data_array) - 1
-#     summe = 0.0
-#
-#     h = (
-#                 (data_array.item((len_array, 0)) - data_array.item((0, 0))) ** 2
-#                 + (data_array.item((len_array, 1)) - data_array.item((0, 1))) ** 2
-#                 + (data_array.item((len_array, 2)) - data_array.item((0, 2))) ** 2
-#         ) \
-#         / float(len_array)
-#     h = math.sqrt(h)
-#     ########################################################################################################
-#     # inner part
-#     for i in range(1, len_array - 0):
-#         #  mydata: X|y|z|ux|uy|uz
-#         summe += h * math.sqrt(
-#             (data_array.item((i, 3)) * v_1)**2 + (data_array.item((i, 4)) * v_2)**2 + (data_array.item((i, 5)) * v_3)
-#     ########################################################################################################
-#     # beginning and end
-#     summe += h * 0.5 * (
-#             math.sqrt(
-#                 (data_array.item((0, 3)) * v_1) ** 2 + (data_array.item((0, 4)) * v_2) ** 2 + (
-#                             data_array.item((0, 5)) * v_3) ** 2
-#             )
-#             +
-#             math.sqrt((data_array.item((len_array, 3)) * v_1) ** 2 + (data_array.item((len_array, 4)) * v_2) ** 2 + (
-#                     data_array.item((len_array, 5)) * v_3) ** 2
-#                       )
-#     )
-#
-#     return (summe)
 
 
 # load data
@@ -131,11 +87,7 @@ def Einlesen():
         #  sort ascending
         c_list.sort()
         for c in c_list[:]:
-            #  print('c', c)
-            #  layout
-            #  x,y,z,u_x,u_y,u_z
-
-            #  loading into mydata
+                        #  loading into mydata
             #  stupid way to ensure every of the four lines has been loaded
             aa = 0
             bb = 0
@@ -227,62 +179,3 @@ if __name__ == '__main__':
         print('viskoser Radius basierend auf Wirbelstärke:', Radius, 'm \n')
 
     print('\n \n -------------------------ende---------------------------------------')
-
-
-def integration(data_array):
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-    # Watch out for len_array already reduced by one!
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-    summe = 0.0
-
-    h = sqrt((((data_array.item((len_array, 0))) ** 2 + (data_array.item((len_array, 1))) ** 2 + (
-        data_array.item((len_array, 2))) ** 2)
-              - (((data_array.item((0, 0))) ** 2 + (data_array.item((0, 1))) ** 2 + (
-                    data_array.item((0, 2)) ** 2))) / float(len_array)))
-
-    for i in range(1, len_array - 0):
-        #  mydata: X|y|z|ux|uy|uz
-        summe += h * data_array.item((i, point))
-
-    summe += h * 0.5 * (data_array.item((0, point)) + data_array.item((len_array, point)))
-    return (summe)
-
-
-def plotting(c_gamma, plotkind):
-    print('plot of gamma*' 'cwd', os.getcwd())
-    # print(c_gamma)
-    os.chdir(os.getcwd() + '/plots/')
-
-    f = plt.figure()
-    x_val = [x[0] for x in c_gamma]
-    y_val = [x[1] for x in c_gamma]
-    plt.ylabel('-Zirkulation')
-    plt.plot(x_val, y_val, linestyle='None')
-    plt.plot(x_val, y_val, 'or', linestyle='None')
-
-    # spezifisch
-    if 'vortex' in plotkind:
-        # plott
-        plt.xlabel('Abstand zur x=0 in, hier x_kood ')
-        f.savefig('gammaspitzenwirbel' + '.pdf', bbox_inches='tight')
-        # file
-
-        f = open('gamma_spitzenwirbelverlauf.data', 'w')
-        f.write('# x in m  \t Gamma in m^2/s \n')
-
-
-    elif 'wing' in plotkind:
-        plt.xlabel('Abstand zur wurzel in, hier z_kood ')
-        f.savefig('gamma*_wing' + '.pdf', bbox_inches='tight')
-        # file
-        f = open('gamma_wing.data', 'w')
-        f.write('# x in m  \t Gamma in m^2/s \n')
-
-    # write file
-    for x in c_gamma:
-        a = x[0]
-        b = x[1]
-        f.write(str(a) + '\t' + str(b) + '\n')
-    f.close
-
-    print('plot and Datafile located in:', os.getcwd())

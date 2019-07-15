@@ -17,13 +17,14 @@ def length_norm(x, y, z, length): # norming vector to a length
     return x, y, z
 
 
-def Einlesen1(plotkind):
+def Einlesen1():
     cwd = os.getcwd()
     print('\n das ist die cwd:\n ', cwd, '\n')
 
     # liste aller datein
     liste_pre = os.listdir(cwd)
     liste = []
+
     # Reduzierung auf nur Folders
     for j in liste_pre:
         print
@@ -34,6 +35,7 @@ def Einlesen1(plotkind):
         neust = max(liste, key=os.path.getctime)
         print('neuster Ordner:', neust, 'Wird ausgewertet')
     elif len(liste) == 0:
+        # wen len(liste) == 0: enthaelt die Liste keinerlei einträge mit sampleDict[..], muss also manueller Modus sein
         dummy = 'n'
         array = None
         return array, dummy
@@ -349,17 +351,18 @@ if __name__ == '__main__':
     # Radius des Kreises
     rad = 0.01
 
-    real_length = 0.02 # absolute groeße des Fensters, ist quadratisch
-    # wie weit im Wirbelstärkenmodus gemittelt werden soll
-    cellsize = 0.0082  # cellsize in core vortex
+    real_length = 0.02  # absolute groeße des Fensters, ist quadratisch
 
+    # wie weit im Wirbelstärkenmodus gemittelt werden soll
+    # soll nicht gemittelt werden, Cellsize oder cellcount =0 setzen
+    cellsize = 0.0082  # cellsize in core vortex
     cellcount = 0      # calculates with the cellsize to the radius, which is used to average around the maximum
     radius = abs(cellcount * cellsize)
 
     # Manuelle Definition des Zentrums
-    #x_c
-    #y_c
-    #z_c
+    # x_c
+    # y_c
+    # z_c
 
     # definition der Vektoren
     # Richtung des Wirbels:
@@ -406,27 +409,10 @@ if __name__ == '__main__':
         print('\n Suchbereich weißt folgende Grenzen auf (x|y|z) \t', xup, '-', xlow, '|', yup, '-', ylow, '|', zup, '-'
               , zlow, '\n')
     ##########################################################################################
-    array, dummy = Einlesen1(plotkind='wing') # liest die Druck oder Voritcity Datei ein
-    ##########################################################################################
-    try:
-        array, dummy
-    except TypeError:
-        print('\n Keine gesampelten Werte gefunden ')
-        definiert = False
-    else:
-        pass
-    ##########################################################################################
-    if dummy != "n":
-        max_vor, max_line, dummy = find_max(array, dummy, xz, yz, zz, rad)  # Bestimmung des maxi/minimalen werts
-
-    try:
-        max_line
-    except NameError:
-        print('\n Es liegen keine Werte im definierten Bereich. Bitte neuen suchbereich definieren. Tool terminiert')
-
+    array, dummy = Einlesen1() # liest die Druck oder Voritcity Datei ein
     #######################################################################
     #           Manuell Definiert
-    # geht nur, wenn weder vorticity noch Druck im postProcessing-ordner sind
+    # geht nur wenn im postProcessing keine "sampleDict[..]" ordner sind
     if dummy == "n":
         print('Verfahren im manuellen Modus')
         try:
@@ -451,7 +437,7 @@ if __name__ == '__main__':
         try:
             x_c, y_c, z_c
         except NameError:
-            print('\n wirbelzentrum nicht definiert')
+            print('\n wirbelzentrum nicht manuell definiert')
             definiert = False
         else:
             if definiert == True:
@@ -459,6 +445,23 @@ if __name__ == '__main__':
                 y_core = y_c
                 z_core = z_c
                 print('Wirbelkern manuell definiert:', x_core, y_core, z_core)
+            # mit "definiert = true" können die Punkte generiert werden
+
+    ##########################################################################################
+
+    if dummy != "n":
+        max_vor, max_line, dummy = find_max(array, dummy, xz, yz, zz, rad)  # Bestimmung des maxi/minimalen werts
+
+    try:
+        max_line
+    except NameError:
+        print('\n Es liegen keine Werte im definierten Bereich. Bitte neuen suchbereich definieren. Tool terminiert')
+    else:
+        x_core = max_line.item(0)
+        y_core = max_line.item(1)
+        z_core = max_line.item(2)
+
+
 
     #############################################################################################################
     #               Druck
@@ -467,14 +470,14 @@ if __name__ == '__main__':
         try:
             a_1, a_2, a_3, b_1, b_2, b_3
         except NameError:
-            print('\n Vektoren fuer Liniengeneration (\" Rechteckvektoren\") fehlen\n')
+            print('\n Vektoren fuer Liniengeneration (\" Rechteckvektoren\") fehlen. Berechnung ueber Wirbelachse\n')
             try:
                 c_1, c_2, c_3
             except NameError:
                 print('\n Wirbelachse nicht definieren, Tool terminiert\n')
                 definiert = False
             else:
-                print('\n Rechteckvektoren werden basierend auf wirbelachse berechnet \n')
+                #print('\n Rechteckvektoren werden basierend auf wirbelachse berechnet \n')
                 a_1, a_2, a_3, b_1, b_2, b_3 = Rotationsmatrix(c_1, c_2, c_3)
                 definiert = True
 
@@ -482,11 +485,8 @@ if __name__ == '__main__':
             print('Variablen definiert')
             definiert = True
 
-        x_core = max_line.item(0)
-        y_core = max_line.item(1)
-        z_core = max_line.item(2)
         p_min = max_line.item(3)  # fuer Berechnung des Viskosen durchmessers
-        print('Wirbelkern auf Basis von Druck:', x_core, y_core, z_core)
+        print('Wirbelkern auf Basis von Druck(x|y|z|p_min):', x_core, y_core, z_core, p_min)
 
     #############################################################################################################
     #               Lambda
@@ -495,14 +495,14 @@ if __name__ == '__main__':
         try:
             a_1, a_2, a_3, b_1, b_2, b_3
         except NameError:
-            print('\n Vektoren fuer Liniengeneration (\" Rechteckvektoren\") fehlen\n')
+            print('\n Vektoren fuer Liniengeneration (\" Rechteckvektoren\") fehlen. Berechnung ueber Wirbelachse\n')
             try:
                 c_1, c_2, c_3
             except NameError:
                 print('\n Wirbelachse nicht definieren, Tool terminiert\n')
                 definiert = False
             else:
-                print('\n Rechteckvektoren werden basierend auf wirbelachse berechnet \n')
+                # print('\n Rechteckvektoren werden basierend auf wirbelachse berechnet \n')
                 a_1, a_2, a_3, b_1, b_2, b_3 = Rotationsmatrix(c_1, c_2, c_3)
                 definiert = True
 
@@ -510,22 +510,18 @@ if __name__ == '__main__':
             print('Rechteckvektoren definiert')
             definiert = True
 
-        x_core = max_line.item(0)
-        y_core = max_line.item(1)
-        z_core = max_line.item(2)
         lambda2_max = max_line.item(3)
-        print('Wirbelkern auf Basis von Lambda2:', x_core, y_core, z_core)
+        print('Wirbelkern auf Basis von Lambda2(x|y|z|lambda2_max):', x_core, y_core, z_core, lambda2_max)
     ############################################################################################################
     #          Vorticity
     if dummy == "v":  # wenn vorticity
         print('Verfahren im Vorticity Modus')
-        if radius != 0:
+        if radius != 0: # Wenn radius = 0 findet keine Mittelung statt
             max_vor, max_line = avg_vorticity(array, max_line, radius)  # Mittelung
         else:
             print('\n Wirbelstaerke wird nicht gemittelt \n')
 
         # checken ob Vektoren definiert sind
-
         try:
             a_1, a_2, a_3, b_1, b_2, b_3
         except NameError:
@@ -533,11 +529,11 @@ if __name__ == '__main__':
             try:
                 c_1, c_2, c_3
             except NameError:
-                print('\n Wirbelachse ist wird berechnet. \n')
+                print('\n Wirbelachse  wird berechnet. \n')
                 definiert = False
             else:
                 definiert = True
-                print('\n Wirbelachsenvetor:', c_1, c_2, c_3,)
+                print('\n Wirbelachsenvetor aus "parameter":', c_1, c_2, c_3,)
                 a_1, a_2, a_3, b_1, b_2, b_3 = Rotationsmatrix(c_1, c_2, c_3)
         else:
              print('Variablen definiert')
@@ -553,20 +549,16 @@ if __name__ == '__main__':
 
         # max_vor -> max vorticity
         # max line: x,y,z,v_x,v_y,v_z
-        x_core = max_line.item(0)
-        y_core = max_line.item(1)
-        z_core = max_line.item(2)
 
         v_x = max_line.item(3)
         v_y = max_line.item(4)
         v_z = max_line.item(5)
-        print('point of max_vor:(x|y|z)', x_core, y_core, z_core)
-
-        # calc vector, alpha: x-axis and vector, ceta: y-axis and vector, eta: z-axis and vecotr
         max_vor = math.sqrt(
             v_x ** 2 + v_y ** 2 + v_z ** 2
         )
+        print('point of max_vor:(x|y|z|max_vorticity)', x_core, y_core, z_core, max_vor)
 
+        # calc vector, alpha: x-axis and vector, ceta: y-axis and vector, eta: z-axis and vecotr
         if definiert == False:
             alpha_cos = v_x / max_vor
             beta_cos = v_y / max_vor
