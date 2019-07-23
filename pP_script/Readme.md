@@ -12,7 +12,7 @@ Das Tool kann über Lambda2 (max), Druck (min) oder Vorticity (max) das Wirbelze
 ## Modi
 
 ### Vorticity
-In ###direction_of_vortex wird die die maximale Voriticity bestimmt und ein Vektor kollinear zum Wirbelkern bestimmt. 
+In ###direction_of_vortex### wird die die maximale Voriticity bestimmt und ein Vektor kollinear zum Wirbelkern bestimmt. 
 
 Um die Genauigkeit zu erhöhen, kann die Vorticity über eine Bereich gemittelt werden. In der Hauptfunktion lässt sich mit dem Faktoren *cellsize* und *cellcount* ein Radius berechnen. Mit dem Ort der maximalen Voritcity und dem Radius ergibt sich eine Kugel. Die Schnittmenge von Kugel UND gesampelten Werten ergibt die Menge an Werten über die die Voricity gemittelt wird. Ziel ist der Ausgleich von lokalen Schwankungen. Dieses Feature ist nur für die Voriticty sinnvoll und verfügbar.
 
