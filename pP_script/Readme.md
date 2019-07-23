@@ -1,17 +1,18 @@
 # Readme für die Zirkulation Tools
-für die Auswertung muss im Case ein *p*ost *P*rocessing Ordner *pP_script* erstellt werden. In diesem Ordner müssen nun die entsprechenden Files hinzugefügt werden. Beispiel: 
+Für die Auswertung muss im Case ein *p*ost *P*rocessing der Ordner *pP_script* erstellt werden. In diesem Ordner müssen nun die Files hinzugefügt werden: 
 pP_script/direction_of_vortex.py
 pP_script/rot_zirkulation.py
 pP_script/rotate_gamma.sc
 
-Die Tools müssen aus dem pP_script Ordner mit *./* gestartet werden. Unter Umständen muss vorher noch chmod +x angewandt werden um die Datei ausführbar zu machen. 
+Das Tool muss aus dem pP_script Ordner mit *./* gestartet werden. Unter Umständen muss vorher noch chmod +x angewandt werden um die Datei ausführbar zu machen. 
+
 ## Was kann das Tool?
-Das Tool kann über Lambda2 (max), Druck(min) oder Vorticity(max) das Wirbelzentrum bestimmen, über die Vorticity kann gleichzeitig auch die Wirbelachse berechnet werden. Bei gegebener Wirbelachse und Wirbelzentrum berechnet das Tool die Zirkulation, bei Druck und Vorticity auch einen Wirbelkerndurchmesser.
+Das Tool kann über Lambda2 (max), Druck (min) oder Vorticity (max) das Wirbelzentrum bestimmen, über die Vorticity kann gleichzeitig auch die Wirbelachse berechnet werden. Bei gegebener Wirbelachse und Wirbelzentrum berechnet das Tool die Zirkulation, bei Druck und Vorticity auch einen Wirbelkerndurchmesser.
 
 ## Modi
 
 ### Vorticity
-In direction_of_vortex wird die die maximale Voriticity bestimmt und ein Vektor kollinear zum Wirbelkern bestimmt. 
+In ###direction_of_vortex wird die die maximale Voriticity bestimmt und ein Vektor kollinear zum Wirbelkern bestimmt. 
 
 Um die Genauigkeit zu erhöhen, kann die Vorticity über eine Bereich gemittelt werden. In der Hauptfunktion lässt sich mit dem Faktoren *cellsize* und *cellcount* ein Radius berechnen. Mit dem Ort der maximalen Voritcity und dem Radius ergibt sich eine Kugel. Die Schnittmenge von Kugel UND gesampelten Werten ergibt die Menge an Werten über die die Voricity gemittelt wird. Ziel ist der Ausgleich von lokalen Schwankungen. Dieses Feature ist nur für die Voriticty sinnvoll und verfügbar.
 
