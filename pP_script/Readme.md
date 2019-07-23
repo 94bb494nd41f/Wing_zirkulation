@@ -6,26 +6,28 @@ pP_script/rotate_gamma.sc
 
 Das Tool muss aus dem pP_script Ordner mit *./* gestartet werden. Unter Umständen muss vorher noch chmod +x angewandt werden um die Datei ausführbar zu machen. 
 
+Bei Unklarheiten empfiehlt sich auf jedenfall ein Blick in den Code.
+
 ## Was kann das Tool?
 Das Tool kann über Lambda2 (max), Druck (min) oder Vorticity (max) das Wirbelzentrum bestimmen, über die Vorticity kann gleichzeitig auch die Wirbelachse berechnet werden. Bei gegebener Wirbelachse und Wirbelzentrum berechnet das Tool die Zirkulation, bei Druck und Vorticity auch einen Wirbelkerndurchmesser.
 
 ## Modi
 
 ### Vorticity
-In ###direction_of_vortex### wird die die maximale Voriticity bestimmt und ein Vektor kollinear zum Wirbelkern bestimmt. 
+In _direction_of_vortex_ wird die die maximale Voriticity bestimmt und ein Vektor kollinear zum Wirbelkern bestimmt. 
 
-Um die Genauigkeit zu erhöhen, kann die Vorticity über eine Bereich gemittelt werden. In der Hauptfunktion lässt sich mit dem Faktoren *cellsize* und *cellcount* ein Radius berechnen. Mit dem Ort der maximalen Voritcity und dem Radius ergibt sich eine Kugel. Die Schnittmenge von Kugel UND gesampelten Werten ergibt die Menge an Werten über die die Voricity gemittelt wird. Ziel ist der Ausgleich von lokalen Schwankungen. Dieses Feature ist nur für die Voriticty sinnvoll und verfügbar.
+Um die Genauigkeit zu erhöhen, kann die Vorticity über eine Bereich gemittelt werden. In der Hauptfunktion lässt sich mit dem Faktoren *cellsize* und *cellcount* ein Radius berechnen. Mit dem Ort der maximalen Voritcity und dem Radius ergibt sich eine Kugel. Die Schnittmenge von Kugel UND gesampelter Ebene ergibt die Menge an Werten über die die Voricity gemittelt wird. Ziel ist der Ausgleich von lokalen Schwankungen. Dieses Feature ist nur für die Voriticty sinnvoll und verfügbar.
 
-Auf Basis der maximalen Vorticity und des Vektors kollinear zum Wirbelkern, c, werden nun die Vektoren a und b bestimmt, die alle orthogonal zueinander stehen. 
+Auf Basis der maximalen Vorticity und des Vektors kollinear zum Wirbelkern, *c*, werden nun die Vektoren *a* und *b* bestimmt, die alle orthogonal zueinander stehen. 
 
 
-Mithilfe der Vektoren a und b sowie der *real_length* werden die Eckpunkte des zu sampelnden Fensters bestimmt.
+Mithilfe der Vektoren *a* und *b* sowie der *real_length* werden die Eckpunkte des zu sampelnden Fensters bestimmt.
 
-Mit der Funktion *sampledict* werden die zu Sampelnden Linien in eine Datei niedergeschrieben, die im nächsten Schritt von rotate_gamma.sc -> Foam aufgerufen wird. 
+Mit der Funktion *sampledict* werden die zu Sampelnden Linien in eine Datei niedergeschrieben, die im nächsten Schritt von *rotate_gamma.sc -> Foam* aufgerufen wird. 
 
 
 ### Druck
-Für die auswertung über den Druck muss entweder die Wirbelachse (*c_i*) oder die Vektoren, die das Rechteck aufspannen (*a_i*,*b_i*), definiert werden. Ist die Wirbelachse gegeben werden *a_i*,*b_i* analog zur Vorticity berechnet. 
+Für die Auswertung über den Druck muss entweder die Wirbelachse (*c_i*) oder die Vektoren, die das Rechteck aufspannen (*a_i*, *b_i*), definiert werden. Ist die Wirbelachse gegeben werden *a_i*, *b_i* analog zur Vorticity berechnet. 
 
 Als Wirbelzentrum werden die Koordinaten des Druckminimum genutzt.
 
