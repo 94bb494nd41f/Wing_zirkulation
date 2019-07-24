@@ -1,8 +1,14 @@
 # Readme für die Zirkulation Tools
 Die Anleitung kann über Gitprint als .pdf gedruckt werden. 
-Für die Auswertung muss im Case ein _p_ost _P_rocessing_ der Ordner _pP_script_ erstellt werden. In diesem Ordner müssen nun die Files hinzugefügt werden: 
+
+Für die Auswertung muss im Case ein _p_ost _P_rocessing_ der Ordner _pP_script_ erstellt werden. In diesem Ordner müssen nun die 
+
+Files hinzugefügt werden: 
+
 pP_script/direction_of_vortex.py
+
 pP_script/rot_zirkulation.py
+
 pP_script/rotate_gamma.sc
 
 Das Tool muss aus dem pP_script Ordner mit _./_ gestartet werden. Unter Umständen muss vorher noch chmod +x angewandt werden um die Datei ausführbar zu machen. 
@@ -91,6 +97,7 @@ funktioniert nur im manuellen Modus(-> keinerlei "sampleDicts[..]" im postProces
 
 _c_i_ (float in m) manuelle Definition einer Wirbelachse. Auf dieser Basis können auch die Rechteckvektoren 
 berechnet werden. Wenn nicht definiert, _muss_ der Vorticitymodus genutzt werden. 
+
 _a_i_, _b_i_ Rechteckvektoren, falls nicht definiert, werden diese über die Wirbelachse berechnet. 
 
 ### Funktionen innerhalb des Programms
@@ -149,4 +156,5 @@ a = Radius des Wirbels
  Die Bestimmung des Wirbelkerndurchmesser ist nur verfügbar, wenn der "Druckmodus" genutzt und eine Wirbelachse definiert ist.
 ### Bestimmung des Wirbelkerndurchemsser nach Dag Feder
 Bei Fragen an Dag Feder wenden. Nur im "Vorticitymodus" verfügbar.
+
 a = sqrt(2.513 Gamma / (2 pi vorticity_0) )
